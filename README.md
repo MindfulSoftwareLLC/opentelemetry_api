@@ -31,6 +31,8 @@ Dartastic.io comes with a generous free tier, various levels of free, paid and e
 additional pro library features that are not available in the open source offering including telemetry 
 that integrates with native code and Real-Time User Monitoring of Flutter apps.  
 
+This Dart API, the Dartastic SDK and Flutterrific OTel are made with 💙 by Michael Bushe at [Mindful Software](https://mindfulsoftware.com).
+
 This `opentelemetry_api` OTel API for Dart exists as a standalone library to strictly adhere to the
 OpenTelemetry specification which separates API and the SDK. The specification
 requires that the API can be dropped into an app without an SDK and it will work in a no-op fashion. 
