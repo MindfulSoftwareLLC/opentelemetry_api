@@ -239,6 +239,7 @@ enum PerformanceSemantics implements OTelSemantic {
 /// RUM Semantics related to errors and crashes
 enum ErrorSemantics implements OTelSemantic {
   errorType('error.type'),
+  errorSource('error.source'),
   errorMessage('error.message'),
   errorStacktrace('error.stacktrace'),
   crashFreeSessionRate('crash.free.session.rate');
