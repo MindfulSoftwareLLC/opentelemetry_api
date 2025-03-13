@@ -8,10 +8,10 @@ export 'src/api/factory/otel_api_factory.dart';
 export 'src/factory/otel_factory.dart';
 // Semantics
 export 'src/api/semantics/semantics.dart';
-export 'src/api/semantics/ui_semantics.dart';
 export 'src/api/semantics/resource_semantics.dart';
 export 'src/api/semantics/navigation_action.dart';
 export 'src/api/semantics/lifecycle_state.dart';
+export 'src/api/semantics/ui_semantics.dart';
 // Baggage
 export 'src/api/baggage/baggage.dart';
 export 'src/api/baggage/baggage_entry.dart';
