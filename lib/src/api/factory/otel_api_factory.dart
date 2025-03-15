@@ -2,7 +2,6 @@
 // Copyright 2025, Michael Bushe, All rights reserved.
 
 import 'dart:typed_data';
-import 'package:intl/intl.dart';
 import 'package:opentelemetry_api/src/api/baggage/baggage.dart';
 import 'package:opentelemetry_api/src/factory/otel_factory.dart';
 import 'package:opentelemetry_api/src/api/trace/span_context.dart';
@@ -22,6 +21,7 @@ import 'package:opentelemetry_api/src/api/metrics/observable_counter.dart';
 import 'package:opentelemetry_api/src/api/metrics/observable_gauge.dart';
 import 'package:opentelemetry_api/src/api/metrics/observable_up_down_counter.dart';
 
+import '../../util/date_util.dart';
 import '../baggage/baggage_entry.dart';
 import '../common/attribute.dart';
 import '../common/attributes.dart';
@@ -47,9 +47,6 @@ OTelFactory otelApiFactoryFactoryFunction({
 /// requires the API to work without an SDK installed
 /// All construction APIs use the factory, such as builders or 'from' helpers.
 class OTelAPIFactory extends OTelFactory {
-  static final dateFormat = DateFormat("yyyy-MM-ddTHH:mm:ss.SSS'Z'");
-
-  static String datTimeToString(DateTime value) => dateFormat.format(value);
 
   OTelAPIFactory(
       {required super.apiEndpoint,
@@ -134,7 +131,7 @@ class OTelAPIFactory extends OTelFactory {
       } else if (value is bool) {
         attributes.add(AttributeCreate.create(key, value));
       } else if (value is DateTime) {
-        String isoTimestamp = datTimeToString(value);
+        String isoTimestamp = dateTimeToString(value);
         attributes
             .add(AttributeCreate.create(key, isoTimestamp));
       } else if (value is Attribute) {

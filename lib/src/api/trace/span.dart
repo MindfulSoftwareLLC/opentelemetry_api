@@ -5,6 +5,7 @@ library span;
 
 import 'package:meta/meta.dart';
 import '../../../opentelemetry_api.dart';
+import '../../util/date_util.dart';
 
 part 'span_create.dart';
 
@@ -208,7 +209,7 @@ class APISpan {
   void setDateTimeAsStringAttribute(String name, DateTime value) {
     if (!isEnded) {
       _attributes = _attributes.copyWithStringAttribute(
-          name, OTelAPIFactory.datTimeToString(value));
+          name, dateTimeToString(value));
     }
   }
 
