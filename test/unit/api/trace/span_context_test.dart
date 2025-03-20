@@ -21,12 +21,12 @@ void main() {
     late SpanId spanId;
     
     setUp(() {
-      traceId = OTelAPI.traceId(bytes: traceIdBytes);
-      spanId = OTelAPI.spanId(bytes: spanIdBytes);
+      traceId = OTelAPI.traceIdFromBytes(traceIdBytes);
+      spanId = OTelAPI.spanIdFromBytes(spanIdBytes);
     });
 
     test('create basic span context', () {
-      final spanContext = OTelAPI.spanContext(
+      final spanContext = OTelAPI.createSpanContext(
         traceId: traceId,
         spanId: spanId,
         traceFlags: TraceFlags.none,
@@ -43,7 +43,7 @@ void main() {
     });
 
     test('create remote span context', () {
-      final spanContext = OTelAPI.spanContext(
+      final spanContext = OTelAPI.createSpanContext(
         traceId: traceId,
         spanId: spanId,
         traceFlags: TraceFlags.sampled,
@@ -52,12 +52,14 @@ void main() {
       );
 
       expect(spanContext.isRemote, isTrue);
-      expect(spanContext.isSampled, isTrue);
+      // Use accessor method instead of isSampled property
+      expect(spanContext.traceFlags == TraceFlags.sampled, isTrue);
     });
 
     test('invalid span context with invalid trace ID', () {
-      final invalidTraceId = TraceId.invalid;
-      final spanContext = OTelAPI.spanContext(
+      // Use factory method instead of invalid getter
+      final invalidTraceId = OTelAPI.invalidTraceId();
+      final spanContext = OTelAPI.createSpanContext(
         traceId: invalidTraceId,
         spanId: spanId,
         traceFlags: TraceFlags.none,
@@ -69,8 +71,9 @@ void main() {
     });
 
     test('invalid span context with invalid span ID', () {
-      final invalidSpanId = SpanId.invalid;
-      final spanContext = OTelAPI.spanContext(
+      // Use factory method instead of invalid getter
+      final invalidSpanId = OTelAPI.invalidSpanId();
+      final spanContext = OTelAPI.createSpanContext(
         traceId: traceId,
         spanId: invalidSpanId,
         traceFlags: TraceFlags.none,
@@ -85,7 +88,8 @@ void main() {
       final traceIdHex = '0102030405060708090a0b0c0d0e0f10';
       final spanIdHex = '0102030405060708';
       
-      final spanContext = SpanContext.fromString(
+      // Use factory method instead of fromString
+      final spanContext = OTelAPI.createSpanContextFromHex(
         traceIdHex: traceIdHex,
         spanIdHex: spanIdHex,
         traceFlagsHex: '01', // sampled flag
@@ -95,7 +99,8 @@ void main() {
 
       expect(spanContext.traceId.toString(), equals(traceIdHex));
       expect(spanContext.spanId.toString(), equals(spanIdHex));
-      expect(spanContext.traceFlags.isSampled, isTrue);
+      // Use accessor instead of isSampled
+      expect(spanContext.traceFlags == TraceFlags.sampled, isTrue);
       expect(spanContext.traceState.get('vendor1'), equals('value1'));
       expect(spanContext.traceState.get('vendor2'), equals('value2'));
       expect(spanContext.isRemote, isTrue);
@@ -107,7 +112,8 @@ void main() {
       final invalidTraceIdHex = '00000000000000000000000000000000';
       final spanIdHex = '0102030405060708';
       
-      final spanContext = SpanContext.fromString(
+      // Use factory method instead of fromString
+      final spanContext = OTelAPI.createSpanContextFromHex(
         traceIdHex: invalidTraceIdHex,
         spanIdHex: spanIdHex,
         traceFlagsHex: '00',
@@ -119,18 +125,20 @@ void main() {
     });
 
     test('create invalidSpanContext', () {
-      final invalidContext = SpanContext.invalid();
+      // Use factory method instead of invalid
+      final invalidContext = OTelAPI.invalidSpanContext();
       
       expect(invalidContext.isValid, isFalse);
-      expect(invalidContext.traceId, equals(TraceId.invalid));
-      expect(invalidContext.spanId, equals(SpanId.invalid));
+      // Use factory methods for getting invalid IDs
+      expect(invalidContext.traceId, equals(OTelAPI.invalidTraceId()));
+      expect(invalidContext.spanId, equals(OTelAPI.invalidSpanId()));
       expect(invalidContext.traceFlags, equals(TraceFlags.none));
       expect(invalidContext.traceState.isEmpty, isTrue);
       expect(invalidContext.isRemote, isFalse);
     });
 
-    test('isSampled returns correct sampling state', () {
-      final sampledContext = OTelAPI.spanContext(
+    test('trace flags indicates sampling state', () {
+      final sampledContext = OTelAPI.createSpanContext(
         traceId: traceId,
         spanId: spanId,
         traceFlags: TraceFlags.sampled,
@@ -138,7 +146,7 @@ void main() {
         isRemote: false,
       );
       
-      final notSampledContext = OTelAPI.spanContext(
+      final notSampledContext = OTelAPI.createSpanContext(
         traceId: traceId,
         spanId: spanId,
         traceFlags: TraceFlags.none,
@@ -146,12 +154,13 @@ void main() {
         isRemote: false,
       );
       
-      expect(sampledContext.isSampled, isTrue);
-      expect(notSampledContext.isSampled, isFalse);
+      // Use accessor instead of isSampled
+      expect(sampledContext.traceFlags == TraceFlags.sampled, isTrue);
+      expect(notSampledContext.traceFlags == TraceFlags.none, isTrue);
     });
 
     test('toString includes all components', () {
-      final spanContext = OTelAPI.spanContext(
+      final spanContext = OTelAPI.createSpanContext(
         traceId: traceId,
         spanId: spanId,
         traceFlags: TraceFlags.sampled,
@@ -167,7 +176,7 @@ void main() {
     });
 
     test('equals compares span contexts correctly', () {
-      final context1 = OTelAPI.spanContext(
+      final context1 = OTelAPI.createSpanContext(
         traceId: traceId,
         spanId: spanId,
         traceFlags: TraceFlags.sampled,
@@ -175,7 +184,7 @@ void main() {
         isRemote: true,
       );
       
-      final context2 = OTelAPI.spanContext(
+      final context2 = OTelAPI.createSpanContext(
         traceId: traceId,
         spanId: spanId,
         traceFlags: TraceFlags.sampled,
@@ -183,7 +192,7 @@ void main() {
         isRemote: true,
       );
       
-      final context3 = OTelAPI.spanContext(
+      final context3 = OTelAPI.createSpanContext(
         traceId: traceId,
         spanId: spanId,
         traceFlags: TraceFlags.none, // Different flags
@@ -193,11 +202,11 @@ void main() {
       
       expect(context1 == context2, isTrue);
       expect(context1 == context3, isFalse);
-      expect(context1 == SpanContext.invalid(), isFalse);
+      expect(context1 == OTelAPI.invalidSpanContext(), isFalse);
     });
 
     test('hashCode is consistent', () {
-      final context1 = OTelAPI.spanContext(
+      final context1 = OTelAPI.createSpanContext(
         traceId: traceId,
         spanId: spanId,
         traceFlags: TraceFlags.sampled,
@@ -205,7 +214,7 @@ void main() {
         isRemote: true,
       );
       
-      final context2 = OTelAPI.spanContext(
+      final context2 = OTelAPI.createSpanContext(
         traceId: traceId,
         spanId: spanId,
         traceFlags: TraceFlags.sampled,
@@ -214,7 +223,7 @@ void main() {
       );
       
       expect(context1.hashCode, equals(context2.hashCode));
-      expect(context1.hashCode == SpanContext.invalid().hashCode, isFalse);
+      expect(context1.hashCode == OTelAPI.invalidSpanContext().hashCode, isFalse);
     });
   });
 }

@@ -135,6 +135,19 @@ class OTelAPI {
         serviceVersion: serviceVersion);
   }
 
+  /// Get the default or named tracer from the global TracerProvider
+  static tracer(String name) {
+    return OTelFactory.otelFactory!.globalDefaultTracerProvider().getTracer(name);
+  }
+
+  static TraceId traceIdFromBytes(List<int> traceIdBytes) {
+    return TraceIdCreate.create(Uint8List.fromList(traceIdBytes));
+  }
+
+  static SpanId spanIdFromBytes(List<int> traceIdBytes) {
+    return SpanIdCreate.create(Uint8List.fromList(traceIdBytes));
+  }
+
   /// The API MUST implement methods to create a SpanContext. These methods
   /// SHOULD be the only way to create a SpanContext. This functionality MUST be
   /// fully implemented in the API, and SHOULD NOT be overridable.
@@ -452,7 +465,4 @@ class OTelAPI {
     Context.resetCurrent();
   }
 
-  static tracer({required String name}) {
-    return OTelFactory.otelFactory!.globalDefaultTracerProvider().getTracer(name);
-  }
 }
