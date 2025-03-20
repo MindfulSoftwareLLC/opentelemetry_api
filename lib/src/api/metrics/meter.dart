@@ -33,12 +33,12 @@ class APIMeter {
   /// Creates a new [APIMeter].
   /// You cannot create a Meter directly; you must use [MeterProvider]:
   /// ```dart
-  /// var meter = OTel.meterProvider().getMeter("my-library");
+  /// var meter = OTel.meterProvider() or more likely, OTel.meterProvider().getMeter("my-library");
   /// ```
   APIMeter._({
-    this.name = '@dartastic/opentelemetry_instrumentation_api',
-    this.schemaUrl = 'https://opentelemetry.io/schemas/1.11.0',
-    this.version = '1.42.0.0', // matches the otel spec version, plus a number
+    required this.name,
+    this.schemaUrl,
+    this.version,
     this.attributes,
   });
 
@@ -163,7 +163,7 @@ class APIMeter {
     required String name,
     String? unit,
     String? description,
-    ObservableCallback? callback,
+    ObservableCallback<T>? callback,
   }) {
     if (name.isEmpty) {
       throw ArgumentError('ObservableCounter name must not be empty');

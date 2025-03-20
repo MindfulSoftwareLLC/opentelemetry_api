@@ -3,6 +3,7 @@
 
 import 'dart:typed_data';
 
+import 'package:opentelemetry_api/src/api/metrics/measurement.dart';
 import 'package:opentelemetry_api/src/api/trace/span_event.dart';
 import 'package:opentelemetry_api/src/api/trace/span_id.dart';
 import 'package:opentelemetry_api/src/api/trace/trace_flags.dart';
@@ -297,5 +298,9 @@ abstract class OTelFactory {
     _meterProviders?.clear();
     _meterProviders = null;
     otelFactory = null;
+  }
+
+  Measurement<T> createMeasurement<T extends num>(T value, [Attributes? attributes]) {
+    return MeasurementCreate.create(value, attributes);
   }
 }

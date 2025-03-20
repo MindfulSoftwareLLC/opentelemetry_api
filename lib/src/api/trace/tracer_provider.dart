@@ -16,7 +16,7 @@ part 'tracer_provider_create.dart';
 /// Use the TracerProvider from the SDK instead.
 /// It provides access to [APITracer]s which are used to trace operations.
 /// You cannot create a TracerProvider directly;
-/// you must use [OTel], for example to get the default tracer:
+/// you must use [OTelAPI] or more likely [OTel], for example to get the default tracer:
 /// ```dart
 /// var tracerProvider = OTel.tracerProvider();
 /// ```

@@ -164,6 +164,7 @@ class Attributes {
 
   @override
   int get hashCode => const MapEquality<String, Attribute>().hash(_entries);
+
 }
 
 /// Extension to create Attributes from a simple Map

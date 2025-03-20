@@ -35,9 +35,9 @@ class APITracer {
   /// var tracer = OTelFactory.tracerProvider().get("my-library");
   /// ```
   APITracer._({
-    this.name = '@dartastic/opentelemetry_instrumentation_api',
-    this.schemaUrl = 'https://opentelemetry.io/schemas/1.11.0',
-    this.version = '1.42.0.0', //matches the otel spec version, plus a number
+    required this.name,
+    this.schemaUrl,
+    this.version,
     this.attributes,
   });
 

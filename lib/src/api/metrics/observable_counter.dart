@@ -19,12 +19,12 @@ class APIObservableCounter<T extends num> {
   final String? _unit;
   final bool _enabled;
   final APIMeter _meter;
-  final List<ObservableCallback> _callbacks = [];
+  final List<ObservableCallback<T>> _callbacks = [];
 
   /// Creates a new observable counter instrument
-  APIObservableCounter(this._name, this._description, this._unit, this._enabled, this._meter, ObservableCallback? callback) {
+  APIObservableCounter(this._name, this._description, this._unit, this._enabled, this._meter, ObservableCallback<T>? callback) {
     if (callback != null) {
-      registerCallback(callback);
+      addCallback(callback);
     }
   }
 
@@ -47,13 +47,13 @@ class APIObservableCounter<T extends num> {
   List<ObservableCallback> get callbacks => List.unmodifiable(_callbacks);
 
   /// Registers a callback function that will be invoked when the instrument is observed.
-  APICallbackRegistration registerCallback(ObservableCallback callback) {
+  APICallbackRegistration addCallback(ObservableCallback<T> callback) {
     _callbacks.add(callback);
-    return _CallbackRegistration(this, callback);
+    return _CallbackRegistration<T>(this, callback);
   }
 
   /// Removes a callback from this instrument.
-  void _removeCallback(ObservableCallback callback) {
+  void removeCallback(ObservableCallback<T> callback) {
     _callbacks.remove(callback);
   }
 
@@ -66,14 +66,14 @@ class APIObservableCounter<T extends num> {
 }
 
 /// Default implementation of [APICallbackRegistration].
-class _CallbackRegistration implements APICallbackRegistration {
-  final APIObservableCounter _instrument;
-  final ObservableCallback _callback;
+class _CallbackRegistration<T extends num> implements APICallbackRegistration<T> {
+  final APIObservableCounter<T> _instrument;
+  final ObservableCallback<T> _callback;
 
   _CallbackRegistration(this._instrument, this._callback);
 
   @override
   void unregister() {
-    _instrument._removeCallback(_callback);
+    _instrument.removeCallback(_callback);
   }
 }

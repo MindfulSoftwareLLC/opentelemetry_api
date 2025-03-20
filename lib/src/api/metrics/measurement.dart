@@ -2,35 +2,27 @@
 // Copyright 2025, Michael Bushe, All rights reserved.
 
 import '../common/attributes.dart';
-import '../otel_api.dart';
+
+part 'measurement_create.dart';
 
 /// Represents a data point reported via the metrics API.
 ///
 /// A Measurement includes a value and optional attributes.
-class Measurement {
+class Measurement<T extends num> {
   /// The value of the measurement.
-  final num value;
+  final T value;
 
   /// Attributes associated with this measurement.
-  final Attributes attributes;
+  final Attributes? attributes;
 
   /// Creates a new Measurement with the specified value and attributes.
   ///
   /// [value] The value of the measurement.
   /// [attributes] Optional attributes to associate with the measurement.
   /// If null, empty attributes will be used.
-  Measurement(this.value, [Attributes? attributes])
-      : attributes = attributes ?? OTelAPI.attributes();
+  Measurement._(this.value, [this.attributes]);
 
-  /// Creates a new Measurement from a value and a map of attribute key-value pairs.
-  ///
-  /// [value] The value of the measurement.
-  /// [attributeMap] A map of attribute key-value pairs.
-  factory Measurement.fromMap(num value, Map<String, Object> attributeMap) {
-    return Measurement(value, attributeMap.isEmpty
-        ? OTelAPI.attributes()
-        : attributeMap.toAttributes());
-  }
+  bool get hasAttributes => attributes != null && attributes!.length > 0;
 
   @override
   String toString() {
@@ -40,10 +32,10 @@ class Measurement {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Measurement &&
-          runtimeType == other.runtimeType &&
-          value == other.value &&
-          attributes == other.attributes;
+          other is Measurement &&
+              runtimeType == other.runtimeType &&
+              value == other.value &&
+              attributes == other.attributes;
 
   @override
   int get hashCode => value.hashCode ^ attributes.hashCode;

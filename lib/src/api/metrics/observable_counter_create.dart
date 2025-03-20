@@ -16,7 +16,7 @@ class ObservableCounterCreate {
     String? description,
     required bool enabled,
     required APIMeter meter,
-    ObservableCallback? callback,
+    ObservableCallback<T>? callback,
   }) {
     return APIObservableCounter<T>(
       name,

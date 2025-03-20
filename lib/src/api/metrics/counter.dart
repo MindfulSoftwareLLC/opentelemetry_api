@@ -47,9 +47,6 @@ class APICounter<T extends num> {
   /// [value] The increment amount. Must be non-negative.
   /// [attributes] The set of attributes to associate with this value.
   void add(T value, [Attributes? attributes]) {
-    if (value < 0) {
-      throw ArgumentError('Counter value must be non-negative');
-    }
     // Base implementation is a no-op
   }
 

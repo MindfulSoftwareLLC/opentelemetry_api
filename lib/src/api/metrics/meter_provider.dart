@@ -14,7 +14,7 @@ part 'meter_provider_create.dart';
 /// Use the MeterProvider from the SDK instead.
 /// It provides access to [APIMeter]s which are used to record metrics.
 /// You cannot create a MeterProvider directly;
-/// you must use [OTel], for example to get the default meter provider:
+/// you must use [OTelAPI] or more likely, [OTel], for example to get the default meter provider:
 /// ```dart
 /// var meterProvider = OTel.meterProvider();
 /// ```
@@ -76,7 +76,7 @@ class APIMeterProvider {
     if (_meterCache.containsKey(key)) {
       return _meterCache[key]!;
     } else {
-      final meter = MeterCreate.create(
+      final meter = APIMeterCreate.create(
         name: validatedName,
         version: version,
         schemaUrl: schemaUrl,

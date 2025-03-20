@@ -307,7 +307,7 @@ class OTelAPIFactory extends OTelFactory {
       description: description,
       unit: unit,
       enabled: false, // API implementation is always disabled
-      meter: MeterCreate.create(name: '@api/default'),
+      meter: APIMeterCreate.create(name: '@api/default'),
     );
   }
 
@@ -318,7 +318,7 @@ class OTelAPIFactory extends OTelFactory {
       description: description,
       unit: unit,
       enabled: false, // API implementation is always disabled
-      meter: MeterCreate.create(name: '@api/default'),
+      meter: APIMeterCreate.create(name: '@api/default'),
     );
   }
 
@@ -329,7 +329,7 @@ class OTelAPIFactory extends OTelFactory {
       description: description,
       unit: unit,
       enabled: false, // API implementation is always disabled
-      meter: MeterCreate.create(name: '@api/default'),
+      meter: APIMeterCreate.create(name: '@api/default'),
     );
   }
 
@@ -340,7 +340,7 @@ class OTelAPIFactory extends OTelFactory {
       description: description,
       unit: unit,
       enabled: false, // API implementation is always disabled
-      meter: MeterCreate.create(name: '@api/default'),
+      meter: APIMeterCreate.create(name: '@api/default'),
       boundaries: boundaries,
     );
   }
@@ -352,7 +352,7 @@ class OTelAPIFactory extends OTelFactory {
       description: description,
       unit: unit,
       enabled: false, // API implementation is always disabled
-      meter: MeterCreate.create(name: '@api/default'),
+      meter: APIMeterCreate.create(name: '@api/default'),
       callback: callback,
     );
   }
@@ -364,7 +364,7 @@ class OTelAPIFactory extends OTelFactory {
       description: description,
       unit: unit,
       enabled: false, // API implementation is always disabled
-      meter: MeterCreate.create(name: '@api/default'),
+      meter: APIMeterCreate.create(name: '@api/default'),
       callback: callback,
     );
   }
@@ -376,7 +376,7 @@ class OTelAPIFactory extends OTelFactory {
       description: description,
       unit: unit,
       enabled: false, // API implementation is always disabled
-      meter: MeterCreate.create(name: '@api/default'),
+      meter: APIMeterCreate.create(name: '@api/default'),
       callback: callback,
     );
   }

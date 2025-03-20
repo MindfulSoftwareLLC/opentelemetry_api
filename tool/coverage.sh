@@ -15,14 +15,14 @@ dart run coverage:format_coverage \
   --out=coverage/lcov.info \
   --package=. \
   --report-on=lib \
-#  --base-directory=. \
+  --base-directory=. \
   --check-ignore
 
 # Generate LCOV report with better branch detection
 echo "Generating coverage report..."
 genhtml coverage/lcov.info \
   -o coverage/html \
-#  --branch-coverage \
+  --branch-coverage \
   --legend
 
 # Open coverage report in default browser (works on macOS)

@@ -4,10 +4,10 @@
 import 'observable_result.dart';
 
 /// A callback function for observable instruments.
-typedef ObservableCallback = void Function(ObservableResult result);
+typedef ObservableCallback<T extends num> = void Function(APIObservableResult<T> result);
 
 /// A registration for an observable callback.
-abstract class APICallbackRegistration {
+abstract class APICallbackRegistration<T extends num> {
   /// Unregisters the callback from the instrument.
   void unregister();
 }

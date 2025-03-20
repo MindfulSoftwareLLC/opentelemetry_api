@@ -4,28 +4,23 @@
 import 'package:opentelemetry_api/opentelemetry_api.dart';
 
 /// Interface for recording observations from observable instruments.
-abstract class ObservableResult {
+class APIObservableResult<T extends num> {
+  List<Measurement<T>>? _measurements;
+
+  APIObservableResult._(this._measurements);
+
   /// Records a measurement with the given value and attributes.
-  void observe(num value, Attributes attributes);
-
-  /// Records a measurement with the given value and attributes as a map.
-  void observeWithMap(num value, Map<String, Object> attributes);
-}
-
-/// API implementation of ObservableResult
-class APIObservableResult implements ObservableResult {
-  final List<Measurement> _measurements = [];
-
-  @override
-  void observe(num value, Attributes attributes) {
-    _measurements.add(Measurement(value, attributes));
+  void observe(T value, [Attributes? attributes]) {
+    _measurements ??= [];
+    _measurements!.add(
+          OTelFactory.otelFactory!.createMeasurement(value, attributes));
   }
 
-  @override
-  void observeWithMap(num value, Map<String, Object> attributes) {
+  /// Records a measurement with the given value and attributes as a map.
+  void observeWithMap(T value, Map<String, Object> attributes) {
     observe(value, attributes.toAttributes());
   }
 
   /// Get all recorded measurements
-  List<Measurement> get measurements => List.unmodifiable(_measurements);
+  List<Measurement<T>> get measurements => List.unmodifiable(_measurements ?? []);
 }

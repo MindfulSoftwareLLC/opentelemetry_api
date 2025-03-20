@@ -3,34 +3,7 @@
 
 import 'dart:typed_data';
 import 'package:meta/meta.dart';
-import 'package:opentelemetry_api/src/api/factory/otel_api_factory.dart';
-import 'package:opentelemetry_api/src/api/id/id_generator.dart';
-import 'package:opentelemetry_api/src/api/semantics/resource_semantics.dart';
-import 'package:opentelemetry_api/src/api/semantics/semantics.dart';
-import 'package:opentelemetry_api/src/api/metrics/meter_provider.dart';
-import 'package:opentelemetry_api/src/api/metrics/counter.dart';
-import 'package:opentelemetry_api/src/api/metrics/gauge.dart';
-import 'package:opentelemetry_api/src/api/metrics/histogram.dart';
-import 'package:opentelemetry_api/src/api/metrics/up_down_counter.dart';
-import 'package:opentelemetry_api/src/api/metrics/observable_counter.dart';
-import 'package:opentelemetry_api/src/api/metrics/observable_gauge.dart';
-import 'package:opentelemetry_api/src/api/metrics/observable_up_down_counter.dart';
-import 'package:opentelemetry_api/src/api/trace/span_context.dart';
-import 'package:opentelemetry_api/src/api/trace/span_event.dart';
-import 'package:opentelemetry_api/src/api/trace/span_id.dart';
-import 'package:opentelemetry_api/src/api/trace/span_link.dart';
-import 'package:opentelemetry_api/src/api/trace/trace_flags.dart';
-import 'package:opentelemetry_api/src/api/trace/trace_id.dart';
-import 'package:opentelemetry_api/src/api/trace/trace_state.dart';
-import 'package:opentelemetry_api/src/api/trace/tracer_provider.dart';
-import 'package:opentelemetry_api/src/factory/otel_factory.dart';
-import 'context/context.dart';
-import 'baggage/baggage.dart';
-import 'baggage/baggage_entry.dart';
-import 'common/attribute.dart';
-import 'common/attributes.dart';
-import 'context/context_key.dart';
-import 'metrics/observable_callback.dart';
+import '../../opentelemetry_api.dart';
 
 /// The [OTelAPI] is the no-op API implementation of OTel, as required by the
 /// specification
@@ -449,6 +422,12 @@ class OTelAPI {
   static APIObservableUpDownCounter createObservableUpDownCounter(String name, {String? description, String? unit, ObservableCallback? callback}) {
     _getAndCacheOtelFactory();
     return OTelFactory.otelFactory!.createObservableUpDownCounter(name, description: description, unit: unit, callback: callback);
+  }
+
+  /// Creates an observable up-down counter instrument
+  static Measurement createMeasurement<T extends num>(T value, [Attributes? attributes]) {
+    _getAndCacheOtelFactory();
+    return OTelFactory.otelFactory!.createMeasurement(value, attributes);
   }
 
   static OTelFactory _getAndCacheOtelFactory() {
