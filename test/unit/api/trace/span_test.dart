@@ -8,7 +8,7 @@ import 'package:opentelemetry_api/src/api/trace/span_kind.dart';
 import 'package:opentelemetry_api/src/api/trace/tracer.dart';
 import 'package:opentelemetry_api/src/api/trace/tracer_provider.dart';
 import 'package:test/test.dart';
-import '../../test_util.dart';
+import '../../../test_util.dart';
 
 void main() {
   group('Span', () {

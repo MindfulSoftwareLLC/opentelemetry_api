@@ -4,11 +4,11 @@
 part of 'measurement.dart';
 
 /// Factory methods for creating [Measurement] instances.
-class MeasurementCreate {
+class MeasurementCreate<T extends num> {
   /// Creates a new [Measurement] instance.
   /// This is an implementation detail and should not be used directly.
   /// Use [APIMeter.createMeasurement()] instead.
-  static create(num value, [Attributes? attributes]) {
-    return Measurement._(value, attributes);
+  static Measurement<T> create<T extends num>(T value, [Attributes? attributes]) {
+    return Measurement<T>._(value, attributes);
   }
 }

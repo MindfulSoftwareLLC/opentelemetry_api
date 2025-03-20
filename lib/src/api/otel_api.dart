@@ -425,7 +425,7 @@ class OTelAPI {
   }
 
   /// Creates an observable up-down counter instrument
-  static Measurement createMeasurement<T extends num>(T value, [Attributes? attributes]) {
+  static Measurement<T> createMeasurement<T extends num>(T value, [Attributes? attributes]) {
     _getAndCacheOtelFactory();
     return OTelFactory.otelFactory!.createMeasurement(value, attributes);
   }
