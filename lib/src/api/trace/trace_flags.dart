@@ -55,5 +55,6 @@ class TraceFlags {
 
   @override
   int get hashCode => _flags.hashCode;
+
 }
 

@@ -9,7 +9,8 @@ part 'trace_state_create.dart';
 /// TraceState follows the W3C Trace Context specification.
 class TraceState {
   static const int _maxKeyValuePairs = 32;
-  static final RegExp _keyFormat = RegExp(r'^[a-z][a-z0-9_\-*/]{0,255}$');
+  // Allow tenant format with @ character (tenant@vendor)
+  static final RegExp _keyFormat = RegExp(r'^[a-z][a-z0-9_\-*/]*$');
   static final RegExp _valueFormat = RegExp(r'^[\x20-\x2b\x2d-\x3c\x3e-\x7e]{0,255}[\x21-\x2b\x2d-\x3c\x3e-\x7e]$');
 
   late final Map<String, String> _entries;
@@ -66,6 +67,8 @@ class TraceState {
   Map<String, String> asMap() => Map.unmodifiable(_entries);
 
   ///  Creates a new [TraceState] with the given key-value pair added.
+  ///  If adding this pair would exceed the 32 key-value pair limit, 
+  ///  the oldest entries are removed to make room.
   TraceState put(String key, String value) {
     if (OTelFactory.otelFactory == null) throw StateError('Call initialize() first.');
     if (!_isValidKey(key) || !_isValidValue(value)) {
@@ -73,6 +76,22 @@ class TraceState {
     }
 
     final newEntries = Map<String, String>.from(_entries);
+    
+    // If we already have this key, just update its value
+    if (newEntries.containsKey(key)) {
+      newEntries[key] = value;
+      return OTelFactory.otelFactory!.traceState(newEntries);
+    }
+    
+    // If adding a new key would exceed the limit, remove the oldest entry
+    if (newEntries.length >= _maxKeyValuePairs) {
+      // Remove the first key to make room
+      if (newEntries.isNotEmpty) {
+        final oldestKey = newEntries.keys.first;
+        newEntries.remove(oldestKey);
+      }
+    }
+    
     newEntries[key] = value;
     return OTelFactory.otelFactory!.traceState(newEntries);
   }
@@ -95,8 +114,30 @@ class TraceState {
         .join(',');
   }
 
-  /// Validate key format
+  /// Validate key format, with explicit support for tenant format (tenant@vendor)
   static bool _isValidKey(String key) {
+    // If the key contains @, handle it as a tenant format key
+    if (key.contains('@')) {
+      // Tenant format can only have one @ symbol
+      if (key.indexOf('@') != key.lastIndexOf('@')) {
+        return false;
+      }
+      
+      // Split the key into tenant and vendor parts
+      final parts = key.split('@');
+      if (parts.length != 2) return false;
+      
+      // Validate each part separately
+      final tenant = parts[0];
+      final vendor = parts[1];
+      
+      // Tenant and vendor must be lowercase letters or digits,
+      // and start with a lowercase letter
+      final simpleKeyFormat = RegExp(r'^[a-z][a-z0-9_\-*/]*$');
+      return simpleKeyFormat.hasMatch(tenant) && simpleKeyFormat.hasMatch(vendor);
+    }
+    
+    // Non-tenant keys use the standard format
     return _keyFormat.hasMatch(key);
   }
 

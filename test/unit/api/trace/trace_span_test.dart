@@ -7,15 +7,13 @@ import 'package:test/test.dart';
 void main() {
   late APITracerProvider tracerProvider;
 
-  setUpAll((){
+  setUp(() {
+    OTelAPI.reset();
     OTelAPI.initialize(
       endpoint: 'http://localhost:4317',
       serviceName: 'test-service',
       serviceVersion: '1.0.0',
     );
-  });
-
-  setUp(() {
     tracerProvider = OTelAPI.tracerProvider();
   });
 

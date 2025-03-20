@@ -13,6 +13,7 @@ void main() {
       serviceVersion: '1.0.0',
     );
   });
+
   group('Measurement', () {
     test('creates int measurement with value', () {
       // Act
@@ -91,6 +92,33 @@ void main() {
       expect(measurement2.toString(), contains('42'));
       expect(measurement2.toString(), contains('key1'));
       expect(measurement2.toString(), contains('value1'));
+    });
+
+    test('hash code is correctly implemented', () {
+      // Arrange
+      final attributes = {'key1': 'value1'}.toAttributes();
+      final measurement1 = OTelAPI.createMeasurement<int>(42, attributes);
+      final measurement2 = OTelAPI.createMeasurement<int>(42, attributes);
+      final measurement3 = OTelAPI.createMeasurement<int>(43, attributes);
+      final measurement4 = OTelAPI.createMeasurement<int>(42, {'key2': 'value2'}.toAttributes());
+
+      // Assert
+      expect(measurement1.hashCode, equals(measurement2.hashCode));
+      expect(measurement1.hashCode, isNot(equals(measurement3.hashCode)));
+      expect(measurement1.hashCode, isNot(equals(measurement4.hashCode)));
+    });
+
+    test('different numeric types work correctly', () {
+      // Act
+      final intMeasurement = OTelAPI.createMeasurement<int>(42);
+      final doubleMeasurement = OTelAPI.createMeasurement<double>(42.5);
+      
+      // Assert
+      expect(intMeasurement.value, isA<int>());
+      expect(intMeasurement.value, equals(42));
+      
+      expect(doubleMeasurement.value, isA<double>());
+      expect(doubleMeasurement.value, equals(42.5));
     });
   });
 }

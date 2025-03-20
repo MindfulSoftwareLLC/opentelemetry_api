@@ -83,7 +83,7 @@ class APISpan {
     } else {
       // Root spans should have an invalid (all zeros) parent span ID
       if (spanContext.parentSpanId != null &&
-          spanContext.parentSpanId.toString() != "0" * 16) {
+          spanContext.parentSpanId!.bytes == SpanId.invalidSpanIdBytes) {
         throw ArgumentError(
             'Root spans must have invalid (all zeros) parent span ID or no parent span ID');
       }
@@ -122,6 +122,10 @@ class APISpan {
   /// Returns the parent span, if any.
   /// Root spans have no parent.
   APISpan? get parentSpan => _parentSpan;
+
+  /// Returns the parent span context, if any.
+  /// Root spans have no parent span context.
+  SpanContext? get parentSpanContext => _parentSpan?.spanContext;
 
   /// Returns the SpanKind of this Span.
   SpanKind get kind => _spankind;
@@ -411,6 +415,7 @@ class APISpan {
       if (_spanStatusCode == null || _spanStatusCode == SpanStatusCode.Unset) {
         _spanStatusCode = spanStatus ?? SpanStatusCode.Ok;
       }
+
     }
   }
 
@@ -421,7 +426,20 @@ class APISpan {
   }
 
   @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! APISpan) return false;
+
+    // Two spans are equal if they have the same span context
+    return _spanContext == other._spanContext;
+  }
+
+  @override
+  int get hashCode => _spanContext.hashCode;
+
+  @override
   String toString() {
     return 'APISpan{_name: $_name, _spanContext: $_spanContext, _spankind: $_spankind, _parentSpan: $_parentSpan, _instrumentationScope: $_instrumentationScope, _startTime: $_startTime, _endTime: $_endTime, _attributes: $_attributes, _spanEvents: $_spanEvents, _spanLinks: $_spanLinks, _spanStatusCode: $_spanStatusCode, _statusDescription: $_statusDescription}';
   }
+
 }

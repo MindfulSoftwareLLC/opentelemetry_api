@@ -56,7 +56,7 @@ void main() {
 
       final attrs = events?.first.attributes?.toMap() ?? {};
       expect(attrs['exception.stacktrace']?.value, isNotNull);
-      expect(attrs['exception.stacktrace']?.value.toString(), contains('test/unit/api/span_exception_test.dart'));
+      expect(attrs['exception.stacktrace']?.value.toString(), contains('test/unit/api/trace/span_exception_test.dart'));
     });
 
     test('records exception with escaped flag', () {

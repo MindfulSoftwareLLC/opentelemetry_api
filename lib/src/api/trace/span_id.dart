@@ -12,6 +12,7 @@ part 'span_id_create.dart';
 class SpanId {
   static const int spanIdLength = 8; // 8 bytes for SpanId
   static final Uint8List invalidSpanIdBytes = Uint8List(spanIdLength);
+  static final SpanId invalidSpanId = SpanId._(Uint8List(spanIdLength));
 
   /// The raw bytes of the span ID
   final Uint8List _bytes;

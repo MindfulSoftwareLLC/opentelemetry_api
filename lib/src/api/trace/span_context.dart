@@ -63,10 +63,15 @@ class SpanContext {
     var jsonMap = {
       'traceId': traceId.toString(),
       'spanId': spanId.toString(),
-      'parentSpanId': parentSpanId?.toString(),
       'traceFlags': traceFlags.asByte,
       'isRemote': _isRemote,
     };
+    
+    // Only include parentSpanId if it exists and is valid
+    if (parentSpanId != null && parentSpanId!.isValid) {
+      jsonMap['parentSpanId'] = parentSpanId!.toString();
+    }
+    
     if (traceState != null) {
       jsonMap['traceState'] =  traceState!.entries;
     }
@@ -76,12 +81,20 @@ class SpanContext {
 
   factory SpanContext.fromJson(Map<String, dynamic> json) {
     if (OTelFactory.otelFactory == null) throw StateError('Call initialize() first.');
+    
+    SpanId? parentSpanId = null;
+    if (json['parentSpanId'] != null) {
+      final parentId = OTelAPI.spanIdFrom(json['parentSpanId'] as String);
+      // Only set parentSpanId if it's valid (not all zeros)
+      if (parentId.isValid) {
+        parentSpanId = parentId;
+      }
+    }
+    
     return OTelAPI.spanContext(
       traceId: OTelAPI.traceIdFrom(json['traceId'] as String),
       spanId: OTelAPI.spanIdFrom(json['spanId'] as String),
-      parentSpanId: json['parentSpanId'] != null
-          ? OTelAPI.spanIdFrom(json['parentSpanId'] as String)
-          : null,
+      parentSpanId: parentSpanId,
       traceFlags: OTelFactory.otelFactory!.traceFlags(json['traceFlags'] as int),
       traceState:
       OTelFactory.otelFactory!.traceState(json['traceState'] as Map<String, String>? ?? {}),
@@ -105,9 +118,9 @@ class SpanContext {
   int get hashCode =>
       traceId.hashCode ^
       spanId.hashCode ^
-      parentSpanId.hashCode ^
+      (parentSpanId?.hashCode ?? 0) ^
       traceFlags.hashCode ^
-      traceState.hashCode ^
+      (traceState?.hashCode ?? 0) ^
       _isRemote.hashCode;
 
   @override

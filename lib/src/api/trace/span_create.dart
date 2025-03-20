@@ -4,7 +4,7 @@
 part of span;
 
 /// Internal constructor access for Span
-class SpanCreate {
+class APISpanCreate {
   /// Creates a Span, only accessible within library
   static APISpan create({
     required String name,
@@ -36,11 +36,11 @@ class SpanCreate {
     } else {
       // Root spans should have an invalid (all zeros) parent span ID
       if (spanContext.parentSpanId != null &&
-          spanContext.parentSpanId.toString() != "0" * 16) {
-        throw ArgumentError('Root spans must have invalid (all zeros) parent span ID or no parent span ID');
+          spanContext.parentSpanId!.bytes == SpanId.invalidSpanIdBytes) {
+        throw ArgumentError(
+            'Root spans must have invalid (all zeros) parent span ID or no parent span ID');
       }
     }
-
     return APISpan._(
       name: name,
       spanContext: spanContext,

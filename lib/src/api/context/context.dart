@@ -52,6 +52,15 @@ class Context {
     _currentContext = newContext;
   }
 
+  /// Clears the current span from the context.
+  /// Returns a new context without the span and span context.
+  static Context clearCurrentSpan() {
+    // Create a new context without span and span context
+    final newContext = current.copyWithoutSpan();
+    _currentContext = newContext;
+    return newContext;
+  }
+
   @visibleForTesting
   static void resetCurrent() {
     _currentContext = ContextCreate.create();
@@ -106,6 +115,14 @@ class Context {
     return Context.current;
   }
 
+  /// Creates a new Context without a span or span context
+  Context copyWithoutSpan() {
+    final newValues = Map<ContextKey, Object?>.from(_values);
+    newValues.remove(_spanKey);
+    newValues.remove(_spanContextKey);
+    return ContextCreate.create(contextMap: newValues);
+  }
+
   /// Creates a new context with the given baggage
   /// Send an empty baggage to avoid sending any name/value pairs to an
   /// untrusted process.
@@ -147,11 +164,12 @@ class Context {
   }
 
   /// Gets the value added for the [ContextKey]
+  /// Returns null if no value is set for this key or if the value's type doesn't match T
   T? get<T>(ContextKey<T> key) {
     final value = _values[key];
     if (value == null) return null;
     if (value is T) return value as T;
-    throw StateError('Value for key ${key.name} is not of type $T');
+    return null; // Return null when types don't match instead of throwing
   }
 
   /// Creates a new Context with the given span set as active
@@ -271,6 +289,7 @@ class Context {
 
   Map<String, dynamic> serialize() {
     final values = <String, dynamic>{};
+    final keyNamesCount = <String, int>{};
 
     // Only serialize baggage if it has entries
     var currentBaggage = baggage;
@@ -291,10 +310,20 @@ class Context {
           json.encode(value);
 
           // If we get here, the value is serializable
+          // Handle multiple keys with the same name
+          String finalKeyName = key.name;
+          
+          // If we've seen this key name before, make it unique
+          keyNamesCount[key.name] = (keyNamesCount[key.name] ?? 0) + 1;
+          if (keyNamesCount[key.name]! > 1) {
+            finalKeyName = '${key.name}-${keyNamesCount[key.name]}';
+          }
+          
           // Create a composite key entry that includes both name and uniqueId
-          values[key.name] = {
+          values[finalKeyName] = {
             'value': value,
             'uniqueId': key.uniqueId,
+            'originalKeyName': key.name, // Store original key name for deserialization
           };
         } catch (e) {
           // Value is not serializable, skip it
@@ -333,9 +362,18 @@ class Context {
         if (value is Map<String, dynamic> && value.containsKey('uniqueId')) {
           final uniqueIdList =
               Uint8List.fromList((value['uniqueId'] as List).cast<int>());
+          
+          // Get the original key name if available, otherwise use the key
+          final keyName = value.containsKey('originalKeyName') ? 
+              value['originalKeyName'] as String : key;
+              
+          // Extract just the base key name in case it has a suffix like "mixed-key-2"      
+          final baseKeyName = keyName.contains('-') ? 
+              keyName.substring(0, keyName.lastIndexOf('-')) : keyName;
+          
           // Recreate the context key with the same name and uniqueId
           final contextKey = OTelFactory.otelFactory!.contextKey(
-            key,
+            baseKeyName,
             uniqueIdList,
           );
           context = context.copyWith(contextKey, value['value']);
@@ -359,5 +397,15 @@ class Context {
   }
 
   @override
-  int get hashCode => Object.hashAll(_values.entries);
+  int get hashCode {
+    // Create a consistent hash based on the values and keys
+    // Sort the keys for consistency
+    final sortedEntries = _values.entries.toList()
+      ..sort((a, b) => a.key.toString().compareTo(b.key.toString()));
+    
+    return Object.hashAll([
+      for (final entry in sortedEntries) 
+        Object.hash(entry.key, entry.value)
+    ]);
+  }
 }

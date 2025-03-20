@@ -1,11 +1,7 @@
 // Licensed under the Apache License, Version 2.0
 // Copyright 2025, Michael Bushe, All rights reserved.
 
-import 'package:opentelemetry_api/src/api/common/attributes.dart';
-import 'package:opentelemetry_api/src/api/otel_api.dart';
-import 'package:opentelemetry_api/src/api/trace/span.dart';
-import 'package:opentelemetry_api/src/api/trace/tracer.dart';
-import 'package:opentelemetry_api/src/api/trace/tracer_provider.dart';
+import 'package:opentelemetry_api/opentelemetry_api.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -22,6 +18,7 @@ void main() {
       );
 
       tracerProvider = OTelAPI.tracerProvider();
+      // Use proper method signature
       tracer = tracerProvider.getTracer('test-tracer');
     });
 
@@ -48,7 +45,7 @@ void main() {
       expect(linkedSpan.spanLinks, hasLength(2));
       expect(linkedSpan.spanLinks?.first.spanContext, equals(span1.spanContext));
       expect(linkedSpan.spanLinks?.last.spanContext, equals(span2.spanContext));
-      expect(linkedSpan.spanLinks?.first.attributes.toMap()['key']?.value, equals('value'));
+      expect(linkedSpan.spanLinks?.first.attributes.getString('key'), equals('value'));
     });
 
     test('adds links after span creation', () {
@@ -60,7 +57,7 @@ void main() {
 
       expect(mainSpan.spanLinks, hasLength(1));
       expect(mainSpan.spanLinks?.first.spanContext, equals(span1.spanContext));
-      expect(mainSpan.spanLinks?.first.attributes.toMap()['key']?.value, equals('value'));
+      expect(mainSpan.spanLinks?.first.attributes.getString('key'), equals('value'));
     });
 
     test('preserves link order', () {
@@ -91,7 +88,7 @@ void main() {
 
       expect(span.spanLinks, hasLength(1));
       expect(span.spanLinks?.first.spanContext, equals(invalidContext));
-      expect(span.spanLinks?.first.attributes.toMap()['key']?.value, equals('value'));
+      expect(span.spanLinks?.first.attributes.getString('key'), equals('value'));
     });
 
     test('isRecording behavior', () {
@@ -103,7 +100,7 @@ void main() {
       expect(span.isRecording, isFalse);
 
       // Operations after end should be ignored
-      span.addEvent( OTelAPI.spanEvent('test-event'));
+      span.addEvent(OTelAPI.spanEvent('test-event'));
       span.setStatus(SpanStatusCode.Error);
       expect(span.spanEvents, isNull);
       expect(span.status, equals(SpanStatusCode.Ok)); // Status should remain unchanged
@@ -149,7 +146,6 @@ void main() {
       // Description should be ignored for OK status
       span.setStatus(SpanStatusCode.Ok, 'Description');
       expect(span.statusDescription, isNull);
-
     });
   });
 }

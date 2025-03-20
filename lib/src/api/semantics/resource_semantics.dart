@@ -177,7 +177,7 @@ enum ExceptionResource implements OTelSemantic {
 
 // Feature Flag Semantic Resource
 /// [Specification](https://opentelemetry.io/docs/specs/semconv/attributes-registry/feature-flag/)
-enum FeatureFlagResource {
+enum FeatureFlagResource implements OTelSemantic {
   featureFlagKey("feature_flag.key"),
   featureFlagVariant("feature_flag.variant"),
   featureFlagProviderName("feature_flag.provider_name"),
@@ -187,6 +187,7 @@ enum FeatureFlagResource {
   featureFlagSetId("feature_flag.set.id"),
   featureFlagVersion("feature_flag.version");
 
+  @override
   final String key;
 
   @override
@@ -199,7 +200,7 @@ enum FeatureFlagResource {
 
 // File Semantic Resource
 /// [Specification](https://opentelemetry.io/docs/specs/semconv/attributes-registry/file/)
-enum FileResource {
+enum FileResource implements OTelSemantic {
   filePath("file.path"),
   fileName("file.name"),
   fileExtension("file.extension"),
@@ -219,6 +220,7 @@ enum FileResource {
   fileForkName("file.fork_name"),
   fileDirectory("file.directory");
 
+  @override
   final String key;
 
   @override
@@ -231,7 +233,7 @@ enum FileResource {
 
 // GenAI Semantic Resource
 /// [Specification](https://opentelemetry.io/docs/specs/semconv/attributes-registry/gen-ai/)
-enum GenAIResource {
+enum GenAIResource implements OTelSemantic {
   genAiOperationName("gen_ai.operation.name"),
   genAiRequestEncodingFormats("gen_ai.request.encoding_formats"),
   genAiRequestFrequencyPenalty("gen_ai.request.frequency_penalty"),
@@ -240,6 +242,7 @@ enum GenAIResource {
   genAiRequestPresencePenalty("gen_ai.request.presence_penalty"),
   genAiRequestSeed("gen_ai.request.seed");
 
+  @override
   final String key;
 
   @override
@@ -282,7 +285,7 @@ enum GraphQLResource implements OTelSemantic {
 
 // Host Semantic Resource (experimental)
 /// [Specification](https://opentelemetry.io/docs/specs/semconv/attributes-registry/host/)
-enum HostResource {
+enum HostResource implements OTelSemantic {
   hostArch("host.arch"),
   hostCpuCacheL2Size("host.cpu.cache.l2.size"),
   hostCpuFamily("host.cpu.family"),
@@ -299,6 +302,7 @@ enum HostResource {
   hostMac("host.mac"),
   hostIp("host.ip");
 
+  @override
   final String key;
 
   @override

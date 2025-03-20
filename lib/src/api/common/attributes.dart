@@ -15,6 +15,10 @@ part 'attributes_create.dart';
 class Attributes {
   final Map<String, Attribute> _entries = {};
 
+  static of(Map<String, String> map) {
+    return OTelAPIFactory.attrsFromMap(map);
+  }
+
   /// Private constructor to enforce immutability.
   Attributes._(List<Attribute> entries) {
     for (var attr in entries) {
@@ -59,7 +63,7 @@ class Attributes {
     if (attribute.value is T) {
       return attribute.value as T;
     } else {
-      throw StateError('Value for key "$key" is not of type ${T.runtimeType}');
+      throw StateError('Value for key "$key" is not of type $T');
     }
   }
 
@@ -164,7 +168,6 @@ class Attributes {
 
   @override
   int get hashCode => const MapEquality<String, Attribute>().hash(_entries);
-
 }
 
 /// Extension to create Attributes from a simple Map

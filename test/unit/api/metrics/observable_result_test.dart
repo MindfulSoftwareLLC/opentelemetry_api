@@ -4,68 +4,99 @@
 import 'package:opentelemetry_api/opentelemetry_api.dart';
 import 'package:test/test.dart';
 
+import 'observable_callback_test.dart';
+
 void main() {
-  group('ObservableResult', () {
-    late TestObservableResult observableResult;
+  setUp(() {
+    OTelAPI.reset();
+    OTelAPI.initialize();
+  });
 
-    setUp(() {
-      OTelAPI.reset();
-      OTelAPI.initialize(
-        endpoint: 'http://localhost:4317',
-        serviceName: 'test-service',
-        serviceVersion: '1.0.0',
-      );
-
-      // Create a direct instance of our test implementation
-      observableResult = TestObservableResult();
-    });
-
-    test('observe works with number value', () {
-      // Act & Assert - Should not throw
-      observableResult.observe(42);
-      observableResult.observe(42.5);
-      observableResult.observe(-10);
-    });
-
-    test('observe works with attributes', () {
+  group('APIObservableResult', () {
+    test('observe adds measurement to the list', () {
       // Arrange
-      final attributes = {'key1': 'value1', 'key2': 123}.toAttributes();
+      final result = TestObservableResult<double>();
 
-      // Act & Assert - Should not throw
-      observableResult.observe(42, attributes);
+      // Act
+      result.observe(42.0);
+
+      // Assert
+      expect(result.measurements.length, equals(1));
+      expect(result.measurements[0].value, equals(42.0));
+      expect(result.measurements[0].attributes, isNull);
     });
 
-    test('observeWithMap works correctly', () {
+    test('observe with attributes adds measurement to the list', () {
       // Arrange
-      final attributeMap = {'key1': 'value1', 'key2': 123};
+      final result = TestObservableResult<int>();
+      final attributes = OTelAPI.attributesFromMap({'key': 'value'});
 
-      // Act & Assert - Should not throw
-      observableResult.observeWithMap(42, attributeMap);
+      // Act
+      result.observe(100, attributes);
+
+      // Assert
+      expect(result.measurements.length, equals(1));
+      expect(result.measurements[0].value, equals(100));
+      expect(result.measurements[0].attributes, equals(attributes));
     });
 
-    test('observeWithMap with empty map is equivalent to observe with null attributes', () {
-      // Act & Assert - Should not throw
-      observableResult.observeWithMap(42, {});
+    test('observeWithMap converts map to attributes', () {
+      // Arrange
+      final result = TestObservableResult<double>();
+      final map = <String, Object>{'key1': 'value1', 'key2': 42};
+
+      // Act
+      result.observeWithMap(99.9, map);
+
+      // Assert
+      expect(result.measurements.length, equals(1));
+      expect(result.measurements[0].value, equals(99.9));
+      expect(result.measurements[0].attributes, isNotNull);
+      expect(result.measurements[0].attributes!.getString('key1'), equals('value1'));
+      expect(result.measurements[0].attributes!.getInt('key2'), equals(42));
+    });
+
+    test('measurements returns unmodifiable list', () {
+      // Arrange
+      final result = TestObservableResult<int>();
+
+      // Act
+      result.observe(1);
+      result.observe(2);
+      final measurements = result.measurements;
+
+      // Assert
+      expect(measurements.length, equals(2));
+      expect(() => measurements.add(OTelFactory.otelFactory!.createMeasurement(3, null)),
+          throwsUnsupportedError);
+    });
+
+    test('measurements returns empty list when no observations', () {
+      // Arrange
+      final result = TestObservableResult<double>();
+
+      // Assert
+      expect(result.measurements, isEmpty);
+    });
+
+    test('multiple observations are recorded correctly', () {
+      // Arrange
+      final result = TestObservableResult<int>();
+
+      // Act
+      result.observe(1);
+      result.observe(2, OTelAPI.attributesFromMap({'test': true}));
+      result.observeWithMap(3, {'name': 'counter'});
+
+      // Assert
+      expect(result.measurements.length, equals(3));
+      expect(result.measurements[0].value, equals(1));
+      expect(result.measurements[1].value, equals(2));
+      expect(result.measurements[2].value, equals(3));
+
+      expect(result.measurements[0].attributes, isNull);
+      expect(result.measurements[1].attributes!.getBool('test'), isTrue);
+      expect(result.measurements[2].attributes!.getString('name'), equals('counter'));
     });
   });
-}
-
-/// Test implementation of ObservableResult for testing purposes
-class TestObservableResult implements APIObservableResult {
-  final List<Measurement> _measurements = [];
-
-  @override
-  List<Measurement> get measurements => List.unmodifiable(_measurements);
-
-  @override
-  void observe(num value, [Attributes? attributes]) {
-    // Store the measurement in our list
-    _measurements.add(OTelAPI.createMeasurement(value, attributes));
-  }
-
-  @override
-  void observeWithMap(num value, Map<String, Object> attributeMap) {
-    final attributes = attributeMap.isEmpty ? null : attributeMap.toAttributes();
-    observe(value, attributes);
-  }
 }

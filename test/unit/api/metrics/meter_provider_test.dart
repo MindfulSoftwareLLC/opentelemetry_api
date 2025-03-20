@@ -15,7 +15,7 @@ void main() {
         serviceName: 'test-service',
         serviceVersion: '1.0.0',
       );
-      
+
       meterProvider = OTelAPI.meterProvider();
     });
 
@@ -77,8 +77,8 @@ void main() {
 
     test('creates separate meters with different attributes', () {
       // Arrange & Act
-      final meter1 = meterProvider.getMeter(name: 'test-meter', attributes: {'key1': 'value1'}.toAttributes());
-      final meter2 = meterProvider.getMeter(name: 'test-meter', attributes: {'key2': 'value2'}.toAttributes());
+      final meter1 = meterProvider.getMeter(name: 'test-meter', attributes: OTelAPI.attributesFromMap({'key1': 'value1'}));
+      final meter2 = meterProvider.getMeter(name: 'test-meter', attributes: OTelAPI.attributesFromMap({'key2': 'value2'}));
 
       // Assert
       expect(identical(meter1, meter2), isFalse);
@@ -114,6 +114,67 @@ void main() {
 
       // Assert
       expect(result, isFalse);
+    });
+
+    test('second shutdown attempt still returns true', () async {
+      // Arrange
+      await meterProvider.shutdown();
+
+      // Act
+      final result = await meterProvider.shutdown();
+
+      // Assert
+      expect(result, isTrue);
+    });
+
+    test('getters and setters work correctly', () {
+      // Test endpoint getter/setter
+      expect(meterProvider.endpoint, equals('http://localhost:4317'));
+      meterProvider.endpoint = 'http://localhost:4318';
+      expect(meterProvider.endpoint, equals('http://localhost:4318'));
+
+      // Test serviceName getter/setter
+      expect(meterProvider.serviceName, equals('test-service'));
+      meterProvider.serviceName = 'new-service';
+      expect(meterProvider.serviceName, equals('new-service'));
+
+      // Test serviceVersion getter/setter
+      expect(meterProvider.serviceVersion, equals('1.0.0'));
+      meterProvider.serviceVersion = '2.0.0';
+      expect(meterProvider.serviceVersion, equals('2.0.0'));
+
+      // Test enabled getter/setter
+      expect(meterProvider.enabled, isTrue);
+      meterProvider.enabled = false;
+      expect(meterProvider.enabled, isFalse);
+
+      // Test isShutdown getter/setter
+      expect(meterProvider.isShutdown, isFalse);
+      meterProvider.isShutdown = true;
+      expect(meterProvider.isShutdown, isTrue);
+    });
+
+    // Test meter caching behavior indirectly
+    test('multiple meters with identical parameters return the same instance', () {
+      final attrs1 = OTelAPI.attributesFromMap({'key': 'value'});
+      final attrs2 = OTelAPI.attributesFromMap({'key': 'value'});
+
+      final meter1 = meterProvider.getMeter(
+        name: 'same-meter',
+        version: '1.0',
+        schemaUrl: 'https://example.com',
+        attributes: attrs1
+      );
+
+      final meter2 = meterProvider.getMeter(
+        name: 'same-meter',
+        version: '1.0',
+        schemaUrl: 'https://example.com',
+        attributes: attrs2
+      );
+
+      // Identical attributes with the same content should result in the same meter
+      expect(identical(meter1, meter2), isTrue);
     });
   });
 }
