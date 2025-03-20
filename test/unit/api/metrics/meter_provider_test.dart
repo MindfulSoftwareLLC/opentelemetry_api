@@ -154,43 +154,27 @@ void main() {
       expect(meterProvider.isShutdown, isTrue);
     });
 
-    test('meter key equality works correctly', () {
-      // Create _MeterKey objects through reflection to test equality
-      final key1 = _createMeterKey('name1', 'version1', 'schema1', null);
-      final key2 = _createMeterKey('name1', 'version1', 'schema1', null);
-      final key3 = _createMeterKey('name2', 'version1', 'schema1', null);
+    // Test meter caching behavior indirectly
+    test('multiple meters with identical parameters return the same instance', () {
+      final attrs1 = OTelAPI.attributesFromMap({'key': 'value'});
+      final attrs2 = OTelAPI.attributesFromMap({'key': 'value'});
 
-      // Test equality
-      expect(key1 == key2, isTrue);
-      expect(key1 == key3, isFalse);
+      final meter1 = meterProvider.getMeter(
+        name: 'same-meter',
+        version: '1.0',
+        schemaUrl: 'https://example.com',
+        attributes: attrs1
+      );
 
-      // Test hashCode
-      expect(key1.hashCode == key2.hashCode, isTrue);
+      final meter2 = meterProvider.getMeter(
+        name: 'same-meter',
+        version: '1.0',
+        schemaUrl: 'https://example.com',
+        attributes: attrs2
+      );
+
+      // Identical attributes with the same content should result in the same meter
+      expect(identical(meter1, meter2), isTrue);
     });
   });
-}
-
-// Helper function to create _MeterKey objects for testing
-Object _createMeterKey(String name, String? version, String? schemaUrl, Attributes? attributes) {
-  // Use the actual MeterProvider to create a _MeterKey through reflection
-  final provider = OTelAPI.meterProvider();
-
-  // Extract the _MeterKey from the provider's implementation details
-  // We just need to create two identical keys to test equality
-  final meter = provider.getMeter(
-    name: name,
-    version: version,
-    schemaUrl: schemaUrl,
-    attributes: attributes
-  );
-
-  // This is just to get the key object into scope
-  meter.toString();
-
-  // Using the private class we would normally do:
-  // return _MeterKey(name, version, schemaUrl, attributes);
-  // But since it's private we have to rely on the provider's implementation
-
-  // Create a fake key that will have the same characteristics
-  return Object(); // This is just a placeholder in the test
 }
