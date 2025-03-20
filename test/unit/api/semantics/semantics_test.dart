@@ -20,5 +20,12 @@ void main() {
       const semantic = TestSemantic('test.key');
       expect(semantic.toString(), equals('test.key'));
     });
+    
+    test('OTelSemanticExtension.toMapEntry should create a map entry with key and value', () {
+      const semantic = TestSemantic('test.key');
+      final entry = semantic.toMapEntry('test.value');
+      expect(entry.key, equals('test.key'));
+      expect(entry.value, equals('test.value'));
+    });
   });
 }

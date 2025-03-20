@@ -1,17 +1,13 @@
 // Licensed under the Apache License, Version 2.0
 // Copyright 2025, Michael Bushe, All rights reserved.
 
-import 'package:opentelemetry_api/src/api/otel_api.dart';
-import 'package:opentelemetry_api/src/api/common/attributes.dart';
-import 'package:opentelemetry_api/src/api/trace/span.dart';
-import 'package:opentelemetry_api/src/api/trace/span_kind.dart';
-import 'package:opentelemetry_api/src/api/trace/tracer.dart';
-import 'package:opentelemetry_api/src/api/trace/tracer_provider.dart';
+import 'package:opentelemetry_api/opentelemetry_api.dart';
 import 'package:test/test.dart';
 import '../../../test_util.dart';
 
 void main() {
-  group('Span', () {
+  group('APISpan', () {
+    late APIMeterProvider meterProvider;
     late APITracerProvider tracerProvider;
     late APITracer tracer;
 
@@ -39,17 +35,19 @@ void main() {
         'doubleList': [1.1,  2.2]
       };
 
+      meterProvider = OTelAPI.meterProvider();
       tracerProvider = OTelAPI.tracerProvider();
-      tracer = tracerProvider.getTracer('test-tracer');
+      tracer = tracerProvider.getTracer(name: 'test-tracer');
     });
 
     tearDown(() async {
       await tracerProvider.shutdown();
+      await meterProvider.shutdown();
     });
 
     test('creates span with correct default values', () {
       final span = tracer.startSpan(
-        'test-span',
+        name: 'test-span',
         kind: SpanKind.internal,
         parentSpan: null,
       );
@@ -65,7 +63,7 @@ void main() {
 
     test('handles attribute updates correctly', () {
       final span = tracer.startSpan(
-        'test-span',
+        name: 'test-span',
         kind: SpanKind.internal,
         parentSpan: null,
       );
@@ -86,9 +84,36 @@ void main() {
       expect(spanAttrs['double.key']?.value, equals(3.14));
     });
 
+    test('handles attribute type-specific setters', () {
+      final span = tracer.startSpan(name: 'test-span');
+      
+      // Test individual attribute setters
+      span.setStringAttribute('string.key', 'string-value');
+      span.setBoolAttribute('bool.key', true);
+      span.setIntAttribute('int.key', 42);
+      span.setDoubleAttribute('double.key', 3.14);
+      
+      // Set list attributes
+      span.setStringArrayAttribute('string.list', ['a', 'b', 'c']);
+      span.setBoolArrayAttribute('bool.list', [true, false, true]);
+      span.setIntArrayAttribute('int.list', [1, 2, 3]);
+      span.setDoubleArrayAttribute('double.list', [1.1, 2.2, 3.3]);
+      
+      // Verify all attributes
+      expect(span.attributes.getString('string.key'), equals('string-value'));
+      expect(span.attributes.getBool('bool.key'), equals(true));
+      expect(span.attributes.getInt('int.key'), equals(42));
+      expect(span.attributes.getDouble('double.key'), equals(3.14));
+      
+      expect(span.attributes.getStringList('string.list'), equals(['a', 'b', 'c']));
+      expect(span.attributes.getBoolList('bool.list'), equals([true, false, true]));
+      expect(span.attributes.getIntList('int.list'), equals([1, 2, 3]));
+      expect(span.attributes.getDoubleList('double.list'), equals([1.1, 2.2, 3.3]));
+    });
+
     test('handles status updates correctly', () {
       final span = tracer.startSpan(
-        'test-span',
+        name: 'test-span',
         kind: SpanKind.internal,
       );
 
@@ -108,7 +133,7 @@ void main() {
     test('records end time when ended', () {
       final startTime = DateTime.now();
       final span = tracer.startSpan(
-        'test-span',
+        name: 'test-span',
         kind: SpanKind.internal,
       );
 
@@ -121,9 +146,26 @@ void main() {
       expect(span.endTime!.isAfter(startTime), isTrue);
     });
 
+    test('records specific end time when provided', () {
+      final startTime = DateTime.now();
+      final span = tracer.startSpan(
+        name: 'test-span',
+        kind: SpanKind.internal,
+      );
+
+      expect(span.isRecording, isTrue);
+      
+      // End with a specific timestamp
+      final endTime = startTime.add(Duration(milliseconds: 500));
+      span.end(endTime: endTime);
+
+      expect(span.isRecording, isFalse);
+      expect(span.endTime, equals(endTime));
+    });
+
     test('ignores updates after end', () {
       final span = tracer.startSpan(
-        'test-span',
+        name: 'test-span',
         kind: SpanKind.internal,
       );
 
@@ -142,7 +184,7 @@ void main() {
 
     test('handles events correctly', () {
       final span = tracer.startSpan(
-        'test-span',
+        name: 'test-span',
         kind: SpanKind.internal,
       );
 
@@ -162,13 +204,27 @@ void main() {
       expect(event?.timestamp, IsBetween(beforeCreation, afterCreation));
     });
 
+    test('addEvent with timestamp', () {
+      final span = tracer.startSpan(name: 'test-span');
+      final timestamp = DateTime.now().subtract(Duration(minutes: 5));
+      
+      span.addEvent(OTelAPI.spanEvent(
+        name: 'test-event',
+        attributes: Attributes.of({'key': 'value'}),
+        timestamp: timestamp,
+      ));
+      
+      final events = span.spanEvents;
+      expect(events?.first.timestamp, equals(timestamp));
+    });
+
     test('handles parent context correctly', () {
       // First create a root span
-      final rootSpan = tracer.startSpan('root-span');
+      final rootSpan = tracer.startSpan(name: 'root-span');
 
       // Now create a child span
       final childSpan = tracer.startSpan(
-        'test-span',
+        name: 'test-span',
         kind: SpanKind.internal,
         parentSpan: rootSpan,  // This sets up the parent-child relationship
       );
@@ -177,7 +233,7 @@ void main() {
       expect(childSpan.spanContext.traceId, equals(rootSpan.spanContext.traceId));
 
       // Verify parent span ID is set correctly
-      expect(childSpan.spanContext.parentSpanId, equals(rootSpan.spanContext.spanId));
+      expect(childSpan.parentSpanContext?.spanId, equals(rootSpan.spanContext.spanId));
 
       // Verify a new span ID was generated
       expect(childSpan.spanContext.spanId, isNot(equals(rootSpan.spanContext.spanId)));
@@ -185,7 +241,7 @@ void main() {
 
     test('handles exceptions correctly', () {
       final span = tracer.startSpan(
-        'test-span',
+        name: 'test-span',
         kind: SpanKind.internal,
       );
 
@@ -207,8 +263,38 @@ void main() {
       expect(eventAttrs[msgKey]?.value, equals(exception.toString()));
     });
 
+    test('recordException with custom attributes', () {
+      final span = tracer.startSpan(name: 'test-span');
+      final exception = Exception('Test error');
+      
+      span.recordException(
+        exception,
+        attributes: Attributes.of({'custom': 'attribute'}),
+      );
+      
+      final events = span.spanEvents;
+      final eventAttrs = events?.first.attributes?.toMap() ?? {};
+      
+      // Should contain both standard exception attributes and custom ones
+      expect(eventAttrs['exception.type']?.value, contains('Exception'));
+      expect(eventAttrs['custom']?.value, equals('attribute'));
+    });
+
+    test('recordException with escaped string', () {
+      final span = tracer.startSpan(name: 'test-span');
+      final exception = Exception('Error with "quotes" and newlines\nand more\r\nstuff');
+      
+      span.recordException(exception);
+      
+      final events = span.spanEvents;
+      final eventAttrs = events?.first.attributes?.toMap() ?? {};
+      
+      // Should contain the full message with escaping preserved
+      expect(eventAttrs['exception.message']?.value, equals(exception.toString()));
+    });
+
     test('setAttributes with mixed types', () {
-      final span = tracer.startSpan('test');
+      final span = tracer.startSpan(name: 'test');
       span.addAttributes(OTelAPI.attributesFromMap(fullyTypesMapOfKVs));
 
       expect(span.attributes, isNotNull);
@@ -217,44 +303,49 @@ void main() {
     });
 
     test('getAttribute returns empty with no attributes', () {
-      final span = tracer.startSpan('test');
+      final span = tracer.startSpan(name: 'test');
       expect(span.attributes.length, equals(0));
     });
 
     test('getAttribute returns null for missing key', () {
-      final span = tracer.startSpan('test',
-          attributes: OTelAPI.attributesFromMap(fullyTypesMapOfKVs));
+      final span = tracer.startSpan(
+        name: 'test',
+        attributes: OTelAPI.attributesFromMap(fullyTypesMapOfKVs)
+      );
       expect(span.attributes, isNotNull);
       expect(span.attributes.getString('str'), 'value');
       expect(span.attributes.getString('str-not-here'), isNull);
     });
 
     test('addEvent\'s', () {
-      final span = tracer.startSpan('test');
-      span.addEvent(OTelAPI.spanEvent('something happened'));
+      final span = tracer.startSpan(name: 'test');
+      span.addEvent(OTelAPI.spanEvent(name: 'something happened'));
       expect(span.spanEvents, isNotNull);
       expect(span.spanEvents!.length, equals(1));
-      span.addEvent(OTelAPI.spanEvent('something else happened', OTelAPI.attributesFromMap({'from': 'here'})));
+      span.addEvent(OTelAPI.spanEvent(
+        name: 'something else happened', 
+        attributes: OTelAPI.attributesFromMap({'from': 'here'})
+      ));
       expect(span.spanEvents, isNotNull);
     });
 
     test('addEvent throws if name is empty', () {
-      final span = tracer.startSpan('test');
+      final span = tracer.startSpan(name: 'test');
       expect(
-            () => span.addEvent(OTelAPI.spanEvent('')),
+        () => span.addEvent(OTelAPI.spanEvent(name: '')),
         throwsArgumentError,
       );
     });
 
     test('end() is idempotent', () {
-      final span = tracer.startSpan('test');
+      final span = tracer.startSpan(name: 'test');
       span.end();
       span.end(); // Should not throw
       expect(span.status, equals(SpanStatusCode.Ok));
     });
 
     test('addEvent twice', () {
-      final span = tracer.startSpan('test');
+      final span = tracer.startSpan(name: 'test');
       span.addEventNow('first');
       expect(span.spanEvents, isNotNull);
       expect(span.spanEvents!.length, equals(1));
@@ -264,7 +355,7 @@ void main() {
     });
 
     test('addEvent ignored after end', () {
-      final span = tracer.startSpan('test');
+      final span = tracer.startSpan(name: 'test');
       span.addEventNow('nice and early');
       span.end();
       expect(span.spanEvents, isNotNull);
@@ -275,7 +366,7 @@ void main() {
     });
 
     test('setStatus ignored after end', () {
-      final span = tracer.startSpan('test');
+      final span = tracer.startSpan(name: 'test');
       expect(span.status, equals(SpanStatusCode.Unset));
       span.end();
       expect(span.status, equals(SpanStatusCode.Ok));
@@ -284,7 +375,7 @@ void main() {
     });
 
     test('recordException is ignored after end', () {
-      final span = tracer.startSpan('test');
+      final span = tracer.startSpan(name: 'test');
       span.end();
       expect(span.spanEvents, isNull);
       span.recordException(Exception('test'));
@@ -292,7 +383,7 @@ void main() {
     });
 
     test('updateName is ignored after end', () {
-      final span = tracer.startSpan('test');
+      final span = tracer.startSpan(name: 'test');
       expect(span.name, equals('test'));
       span.updateName('new name');
       expect(span.name, equals('new name'));
@@ -300,6 +391,79 @@ void main() {
       span.updateName('too late');
       expect(span.name, equals('new name'));
     });
+
+    test('spanContext returns valid SpanContext', () {
+      final span = tracer.startSpan(name: 'test-span');
+      final context = span.spanContext;
+      
+      expect(context.isValid, isTrue);
+      expect(context.traceId.isValid, isTrue);
+      expect(context.spanId.isValid, isTrue);
+    });
+
+    test('creates span with links', () {
+      // Create a span to link to
+      final linkedSpan = tracer.startSpan(name: 'linked-span');
+      final linkedContext = linkedSpan.spanContext;
+      
+      // Create links with attributes
+      final linkAttrs = Attributes.of({'link.attr': 'value'});
+      final links = [SpanLink(linkedContext, linkAttrs)];
+      
+      // Create a span with links
+      final span = tracer.createSpan(
+        name: 'test-span',
+        links: links,
+      );
+      
+      // Links are not directly accessible in the API but are passed to the SDK
+      expect(span, isNotNull);
+    });
+
+    test('static key returns ContextKey for Span', () {
+      expect(APISpan.key, isNotNull);
+      expect(APISpan.key.toString(), contains('Span'));
+    });
+
+    test('static current returns current span from context', () {
+      final span = tracer.startSpan(name: 'test');
+      
+      // Before setting context
+      expect(APISpan.current, isNot(equals(span)));
+      
+      // Set context
+      final testContext = Context.current.setValue(APISpan.key, span);
+      Context.current = testContext;
+      
+      // Now it should be the current span
+      expect(APISpan.current, equals(span));
+      
+      // Reset context
+      Context.current = Context.root;
+    });
+
+    test('span factory methods', () {
+      final timestamp = DateTime.now();
+      
+      final span = OTelAPI.span(
+        name: 'test-span',
+        spanContext: SpanContext.invalid(),
+        parentSpanContext: null,
+        spanKind: SpanKind.server,
+        startTime: timestamp,
+        endTime: null,
+        attributes: Attributes.of({'key': 'value'}),
+        events: [OTelAPI.spanEvent(name: 'test-event')],
+        links: [],
+        status: SpanStatusCode.Ok,
+        statusDescription: null,
+      );
+      
+      expect(span.name, equals('test-span'));
+      expect(span.kind, equals(SpanKind.server));
+      expect(span.attributes.getString('key'), equals('value'));
+      expect(span.status, equals(SpanStatusCode.Ok));
+      expect(span.spanEvents?.length, equals(1));
+    });
   });
 }
-

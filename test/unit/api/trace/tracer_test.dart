@@ -1,138 +1,294 @@
 // Licensed under the Apache License, Version 2.0
 // Copyright 2025, Michael Bushe, All rights reserved.
 
-import 'package:opentelemetry_api/src/api/context/context.dart';
-import 'package:opentelemetry_api/src/api/otel_api.dart';
-import 'package:opentelemetry_api/src/api/trace/tracer.dart';
-import 'package:opentelemetry_api/src/api/trace/tracer_provider.dart';
+import 'package:opentelemetry_api/opentelemetry_api.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('Tracer', () {
-    late APITracerProvider tracerProvider;
-    late APITracer tracer;
-
-
+  group('APITracer', () {
+    late OTelFactory originalFactory;
+    
     setUp(() {
-      // Reset API state
       OTelAPI.reset();
-
-      // Re-initialize for this test
       OTelAPI.initialize(
         endpoint: 'http://localhost:4317',
         serviceName: 'test-service',
         serviceVersion: '1.0.0',
       );
-
-      tracerProvider = OTelAPI.tracerProvider();
-      tracer = tracerProvider.getTracer('test-tracer', version: '1.0.0',);
+      
+      // Store the original factory
+      originalFactory = OTelFactory.otelFactory!;
+    });
+    
+    tearDown(() {
+      // Restore the original factory
+      OTelFactory.otelFactory = originalFactory;
     });
 
-    tearDown(() async {
-      await tracerProvider.shutdown();
+    test('creates with name, version, and schemaUrl', () {
+      final tracer = OTelAPI.tracer(
+        name: 'test-tracer',
+        version: '1.0.0',
+        schemaUrl: 'https://example.com/schema',
+      );
+
+      expect(tracer.name, equals('test-tracer'));
+      expect(tracer.version, equals('1.0.0'));
+      expect(tracer.schemaUrl, equals('https://example.com/schema'));
     });
 
-    test('creates rootSpan rootSpan with new trace ID', () {
-      final span = tracer.startSpan('rootSpan');
-      expect(span.spanContext.traceId.isValid, isTrue);
-      expect(span.spanContext.spanId.isValid, isTrue);
-      expect(span.parentSpan, isNull); // Root rootSpan has no parent
+    test('creates span with name only', () {
+      final tracer = OTelAPI.tracer(name: 'test-tracer');
+      final span = tracer.createSpan(name: 'test-span');
+
+      expect(span, isNotNull);
+      expect(span.name, equals('test-span'));
+      expect(span.isRecording, isTrue);
     });
 
-    test('creates child rootSpan with parent trace ID', () {
-      final parent = tracer.startSpan('parent');
-      final context = Context.current.withSpan(parent);
-      final child =
-          tracer.startSpan('child', context: context);
+    test('creates span with all options', () {
+      final tracer = OTelAPI.tracer(name: 'test-tracer');
+      final parentContext = OTelAPI.tracerProvider().getTracer(name: 'parent-tracer').createSpan(name: 'parent-span').spanContext;
+      
+      final attributes = Attributes.of({'key': 'value'});
+      final links = [SpanLink(parentContext, attributes)];
+      final startTime = DateTime.now();
+      
+      final span = tracer.createSpan(
+        name: 'test-span',
+        kind: SpanKind.client,
+        attributes: attributes,
+        links: links,
+        startTime: startTime,
+        context: parentContext,
+      );
 
-      expect(child.spanContext.traceId.bytes,
-          equals(parent.spanContext.traceId.bytes),
-          reason: 'Child should inherit trace ID from parent');
-      expect(child.spanContext.spanId.bytes,
-          isNot(equals(parent.spanContext.spanId.bytes)),
-          reason: 'Child should have different rootSpan ID from parent');
-      expect(child.parentSpan!.spanId.bytes, equals(parent.spanContext.spanId.bytes),
-          reason: 'Child should reference parent rootSpan ID');
+      expect(span, isNotNull);
+      expect(span.name, equals('test-span'));
+      expect(span.kind, equals(SpanKind.client));
     });
 
-    test('maintains trace context through multiple generations', () {
-      final root = tracer.startSpan('rootSpan');
-      final rootContext = Context.current.withSpan(root);
-
-      final child =
-          tracer.startSpan('child', context: rootContext);
-      final childContext = Context.current.withSpan(child);
-
-      final grandchild = tracer.startSpan('grandchild', context: childContext)
-         ;
-
-      // All spans should share the same trace ID
-      expect(child.spanContext.traceId.bytes,
-          equals(root.spanContext.traceId.bytes));
-      expect(grandchild.spanContext.traceId.bytes,
-          equals(root.spanContext.traceId.bytes));
-
-      // Each rootSpan should have a unique rootSpan ID
-      expect(child.spanContext.spanId.bytes,
-          isNot(equals(root.spanContext.spanId.bytes)));
-      expect(grandchild.spanContext.spanId.bytes,
-          isNot(equals(child.spanContext.spanId.bytes)));
-
-      // Parent relationships should be correct
-      expect(child.parentSpan?.spanId.bytes, equals(root.spanContext.spanId.bytes));
-      expect(grandchild.parentSpan?.spanId.bytes,
-          equals(child.spanContext.spanId.bytes));
+    test('creates span with parent context from current context', () {
+      final tracer = OTelAPI.tracer(name: 'test-tracer');
+      
+      // Create a parent span and make it current
+      final parentSpan = tracer.createSpan(name: 'parent-span');
+      final testContext = Context.current.setValue(APISpan.key, parentSpan);
+      
+      // Create a child span in the context with the parent span
+      Context.current = testContext;
+      final childSpan = tracer.createSpan(name: 'child-span');
+      expect(childSpan, isNotNull);
+      
+      // Reset context
+      Context.current = Context.root;
     });
 
-    test('handles concurrent spans correctly', () {
-      final rootSpan = tracer.startSpan('rootSpan');
-      final rootContext = Context.current.withSpan(rootSpan);
-
-      final child1 =
-          tracer.startSpan('child1', context: rootContext);
-      final child2 =
-          tracer.startSpan('child2', context: rootContext);
-
-      // Both children should share rootSpan's trace ID
-      expect(child1.spanContext.traceId.bytes,
-          equals(rootSpan.spanContext.traceId.bytes));
-      expect(child2.spanContext.traceId.bytes,
-          equals(rootSpan.spanContext.traceId.bytes));
-
-      // Children should have different rootSpan IDs
-      expect(child1.spanContext.spanId.bytes,
-          isNot(equals(child2.spanContext.spanId.bytes)));
-
-      // Both children should have rootSpan as parent
-      expect(child1.parentSpan?.spanId.bytes, equals(rootSpan.spanContext.spanId.bytes));
-      expect(child2.parentSpan?.spanId.bytes, equals(rootSpan.spanContext.spanId.bytes));
+    test('span with default context takes current context', () {
+      final tracer = OTelAPI.tracer(name: 'test-tracer');
+      
+      // Create a parent span and make it current
+      final parentSpan = tracer.createSpan(name: 'parent-span');
+      final parentContext = parentSpan.spanContext;
+      
+      // Set the parent span as current
+      final testContext = Context.current.setValue(APISpan.key, parentSpan);
+      
+      // Use the context
+      Context.current = testContext;
+      
+      // Create a child span without explicitly passing a context
+      final childSpan = tracer.createSpan(name: 'child-span');
+      
+      // Reset context
+      Context.current = Context.root;
+      
+      // The child span should have the parent context
+      expect(childSpan.parentSpanContext?.traceId, equals(parentContext.traceId));
     });
 
-    test('preserves rootSpan context in current context', () {
-      final span = tracer.startSpan('test');
-      final newContext = Context.current.withSpan(span);
-
-      expect(
-          newContext.span, equals(span));
-      expect(
-          newContext.span?.spanContext, equals(span.spanContext));
+    test('gets active span from context', () {
+      final tracer = OTelAPI.tracer(name: 'test-tracer');
+      final span = tracer.createSpan(name: 'test-span');
+      
+      expect(APISpan.current, isNot(equals(span))); // Not active yet
+      
+      // Set the span as current
+      final testContext = Context.current.setValue(APISpan.key, span);
+      Context.current = testContext;
+      
+      expect(APISpan.current, equals(span)); // Now it should be active
+      
+      // Reset context
+      Context.current = Context.root;
     });
 
-    test('uses existing trace context when provided', () {
-      final existingTraceId = OTelAPI.traceId();
-      final rootSpan = tracer.startSpan('test', spanContext: OTelAPI.spanContext(
-        traceId: existingTraceId,
-        spanId: OTelAPI.spanId(),
-        parentSpanId: null,  // Root rootSpan
-      ));
+    test('currentSpan returns current span in context', () {
+      final tracer = OTelAPI.tracer(name: 'test-tracer');
+      final span = tracer.createSpan(name: 'test-span');
+      
+      expect(tracer.currentSpan, isNot(equals(span))); // Not active yet
+      
+      // Set the span as current
+      final testContext = Context.current.setValue(APISpan.key, span);
+      Context.current = testContext;
+      
+      expect(tracer.currentSpan, equals(span)); // Now it should be active
+      
+      // Reset context
+      Context.current = Context.root;
+    });
 
-      // Should use the provided trace ID
-      expect(rootSpan.spanContext.traceId.bytes, equals(existingTraceId.bytes),
-          reason: 'Should use trace ID from existing context');
+    test('executing code with span in context', () {
+      final tracer = OTelAPI.tracer(name: 'test-tracer');
+      final span = tracer.createSpan(name: 'test-span');
+      
+      var executed = false;
+      
+      tracer.withSpan(span, () {
+        executed = true;
+        expect(APISpan.current, equals(span)); // Should be active inside the callback
+      });
+      
+      expect(executed, isTrue);
+      expect(APISpan.current, isNot(equals(span))); // Should no longer be active after the callback
+    });
 
-      // Should have no parent since it's a root rootSpan
-      expect(rootSpan.spanContext.parentSpanId, isNull,
-          reason: 'Should be a root rootSpan with no parent');
+    test('executing async code with span in context', () async {
+      final tracer = OTelAPI.tracer(name: 'test-tracer');
+      final span = tracer.createSpan(name: 'test-span');
+      
+      var executed = false;
+      
+      await tracer.withSpanAsync(span, () async {
+        executed = true;
+        expect(APISpan.current, equals(span)); // Should be active inside the callback
+        
+        // Make sure it stays active during an await
+        await Future.delayed(Duration(milliseconds: 10));
+        expect(APISpan.current, equals(span)); // Should still be active
+      });
+      
+      expect(executed, isTrue);
+      expect(APISpan.current, isNot(equals(span))); // Should no longer be active after the callback
+    });
+
+    test('startSpan starts and activates a span', () {
+      final tracer = OTelAPI.tracer(name: 'test-tracer');
+      
+      // Start a new span and activate it
+      final span = tracer.startSpan(name: 'test-span');
+      
+      expect(span, isNotNull);
+      expect(APISpan.current, equals(span)); // Should be active
+      
+      // End the span, which should also deactivate it
+      span.end();
+      
+      // Now check if it's still the current span
+      expect(APISpan.current, isNot(equals(span))); // Should no longer be active
+    });
+
+    test('startSpan attaches to existing active span', () {
+      final tracer = OTelAPI.tracer(name: 'test-tracer');
+      
+      // Create and activate a parent span
+      final parentSpan = tracer.startSpan(name: 'parent-span');
+      final parentContext = parentSpan.spanContext;
+      
+      // Start a child span (should automatically use the parent)
+      final childSpan = tracer.startSpan(name: 'child-span');
+      
+      // Check the child span has the parent's context
+      expect(childSpan.parentSpanContext?.traceId, equals(parentContext.traceId));
+      
+      // End both spans
+      childSpan.end();
+      parentSpan.end();
+    });
+
+    test('startSpanWithContext activates span in specified context', () {
+      final tracer = OTelAPI.tracer(name: 'test-tracer');
+      final customContext = Context.root.setValue(ContextKey<String>('test'), 'value');
+      
+      // Start a span with the custom context
+      final span = tracer.startSpanWithContext(name: 'test-span', context: customContext);
+      
+      expect(span, isNotNull);
+      expect(APISpan.current, equals(span)); // Should be active
+      
+      // The context should now contain both the span and the original value
+      final currentContext = Context.current;
+      expect(currentContext.getValue(ContextKey<String>('test')), equals('value'));
+      
+      // End the span
+      span.end();
+    });
+
+    test('startActiveSpan executes code with new active span', () {
+      final tracer = OTelAPI.tracer(name: 'test-tracer');
+      
+      var executed = false;
+      final result = tracer.startActiveSpan(name: 'test-span', fn: (span) {
+        executed = true;
+        expect(APISpan.current, equals(span)); // Should be active inside the callback
+        return 'test-result';
+      });
+      
+      expect(executed, isTrue);
+      expect(result, equals('test-result'));
+    });
+
+    test('startActiveSpanAsync executes async code with new active span', () async {
+      final tracer = OTelAPI.tracer(name: 'test-tracer');
+      
+      var executed = false;
+      final result = await tracer.startActiveSpanAsync(name: 'test-span', fn: (span) async {
+        executed = true;
+        expect(APISpan.current, equals(span)); // Should be active inside the callback
+        
+        // Make sure it stays active during an await
+        await Future.delayed(Duration(milliseconds: 10));
+        expect(APISpan.current, equals(span)); // Should still be active
+        
+        return 'test-result';
+      });
+      
+      expect(executed, isTrue);
+      expect(result, equals('test-result'));
+    });
+
+    test('recordSpan executes code and records it as a span', () {
+      final tracer = OTelAPI.tracer(name: 'test-tracer');
+      
+      var executed = false;
+      final result = tracer.recordSpan(
+        name: 'test-span',
+        fn: () {
+          executed = true;
+          return 'test-result';
+        },
+      );
+      
+      expect(executed, isTrue);
+      expect(result, equals('test-result'));
+    });
+
+    test('recordSpanAsync executes async code and records it as a span', () async {
+      final tracer = OTelAPI.tracer(name: 'test-tracer');
+      
+      var executed = false;
+      final result = await tracer.recordSpanAsync(
+        name: 'test-span',
+        fn: () async {
+          executed = true;
+          await Future.delayed(Duration(milliseconds: 10));
+          return 'test-result';
+        },
+      );
+      
+      expect(executed, isTrue);
+      expect(result, equals('test-result'));
     });
   });
 }

@@ -451,4 +451,8 @@ class OTelAPI {
     // ignore: invalid_use_of_visible_for_testing_member
     Context.resetCurrent();
   }
+
+  static tracer({required String name}) {
+    return OTelFactory.otelFactory!.globalDefaultTracerProvider().getTracer(name);
+  }
 }

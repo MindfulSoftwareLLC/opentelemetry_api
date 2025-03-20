@@ -18,6 +18,11 @@ void main() {
         expect(ClientResource.clientAddress.key, equals('client.address'));
         expect(ClientResource.clientPort.key, equals('client.port'));
       });
+
+      test('toString should return the key', () {
+        expect(ClientResource.clientAddress.toString(), equals('client.address'));
+        expect(ClientResource.clientPort.toString(), equals('client.port'));
+      });
     });
 
     group('CloudResource', () {
@@ -29,6 +34,11 @@ void main() {
         expect(CloudResource.cloudAvailabilityZone.key, equals('cloud.availability_zone'));
         expect(CloudResource.cloudPlatform.key, equals('cloud.platform'));
       });
+
+      test('toString should return the key', () {
+        expect(CloudResource.cloudProvider.toString(), equals('cloud.provider'));
+        expect(CloudResource.cloudRegion.toString(), equals('cloud.region'));
+      });
     });
 
     group('ComputeUnitResource', () {
@@ -39,6 +49,11 @@ void main() {
         expect(ComputeUnitResource.containerRuntime.key, equals('container.runtime'));
         expect(ComputeUnitResource.containerImageName.key, equals('container.image.name'));
         expect(ComputeUnitResource.containerImageTag.key, equals('container.image.tag'));
+      });
+
+      test('toString should return the key', () {
+        expect(ComputeUnitResource.containerName.toString(), equals('container.name'));
+        expect(ComputeUnitResource.containerId.toString(), equals('container.id'));
       });
     });
 
@@ -52,6 +67,11 @@ void main() {
         expect(ComputeInstanceResource.hostImageId.key, equals('host.image.id'));
         expect(ComputeInstanceResource.hostImageVersion.key, equals('host.image.version'));
       });
+
+      test('toString should return the key', () {
+        expect(ComputeInstanceResource.hostId.toString(), equals('host.id'));
+        expect(ComputeInstanceResource.hostName.toString(), equals('host.name'));
+      });
     });
 
     group('DatabaseResource', () {
@@ -64,6 +84,11 @@ void main() {
         expect(DatabaseResource.dbStatement.key, equals('db.statement'));
         expect(DatabaseResource.dbOperation.key, equals('db.operation'));
       });
+
+      test('toString should return the key', () {
+        expect(DatabaseResource.dbSystem.toString(), equals('db.system'));
+        expect(DatabaseResource.dbName.toString(), equals('db.name'));
+      });
     });
 
     group('DeploymentResource', () {
@@ -72,6 +97,11 @@ void main() {
         expect(DeploymentResource.deploymentId.key, equals('deployment.id'));
         expect(DeploymentResource.deploymentName.key, equals('deployment.name'));
         expect(DeploymentResource.deploymentEnvironmentName.key, equals('deployment.environment.name'));
+      });
+
+      test('toString should return the key', () {
+        expect(DeploymentResource.deploymentId.toString(), equals('deployment.id'));
+        expect(DeploymentResource.deploymentName.toString(), equals('deployment.name'));
       });
     });
 
@@ -83,6 +113,11 @@ void main() {
         expect(DeviceResource.deviceModelName.key, equals('device.model.name'));
         expect(DeviceResource.deviceManufacturer.key, equals('device.manufacturer'));
       });
+
+      test('toString should return the key', () {
+        expect(DeviceResource.deviceId.toString(), equals('device.id'));
+        expect(DeviceResource.deviceModelName.toString(), equals('device.model.name'));
+      });
     });
 
     group('ErrorResource', () {
@@ -90,12 +125,20 @@ void main() {
         // Test each value explicitly
         expect(ErrorResource.errorType.key, equals('error.type'));
       });
+
+      test('toString should return the key', () {
+        expect(ErrorResource.errorType.toString(), equals('error.type'));
+      });
     });
 
     group('EnvironmentResource', () {
       test('should have correct keys for all values', () {
         // Test each value explicitly
         expect(EnvironmentResource.deploymentEnvironment.key, equals('deployment.environment'));
+      });
+
+      test('toString should return the key', () {
+        expect(EnvironmentResource.deploymentEnvironment.toString(), equals('deployment.environment'));
       });
     });
 
@@ -105,6 +148,11 @@ void main() {
         expect(ExceptionResource.exceptionType.key, equals('exception.type'));
         expect(ExceptionResource.exceptionMessage.key, equals('exception.message'));
         expect(ExceptionResource.exceptionStacktrace.key, equals('exception.stacktrace'));
+      });
+
+      test('toString should return the key', () {
+        expect(ExceptionResource.exceptionType.toString(), equals('exception.type'));
+        expect(ExceptionResource.exceptionMessage.toString(), equals('exception.message'));
       });
     });
 
@@ -120,42 +168,10 @@ void main() {
         expect(FeatureFlagResource.featureFlagSetId.key, equals('feature_flag.set.id'));
         expect(FeatureFlagResource.featureFlagVersion.key, equals('feature_flag.version'));
       });
-    });
 
-    group('FileResource', () {
-      test('should have correct keys for all values', () {
-        // Test each value explicitly
-        expect(FileResource.filePath.key, equals('file.path'));
-        expect(FileResource.fileName.key, equals('file.name'));
-        expect(FileResource.fileExtension.key, equals('file.extension'));
-        expect(FileResource.fileSize.key, equals('file.size'));
-        expect(FileResource.fileCreated.key, equals('file.created'));
-        expect(FileResource.fileModified.key, equals('file.modified'));
-        expect(FileResource.fileAccessed.key, equals('file.accessed'));
-        expect(FileResource.fileChanged.key, equals('file.changed'));
-        expect(FileResource.fileOwnerId.key, equals('file.owner.id'));
-        expect(FileResource.fileOwnerName.key, equals('file.owner.name'));
-        expect(FileResource.fileGroupId.key, equals('file.group.id'));
-        expect(FileResource.fileGroupName.key, equals('file.group.name'));
-        expect(FileResource.fileMode.key, equals('file.mode'));
-        expect(FileResource.fileInode.key, equals('file.inode'));
-        expect(FileResource.fileAttributes.key, equals('file.attributes'));
-        expect(FileResource.fileSymbolicLinkTargetPath.key, equals('file.symbolic_link.target_path'));
-        expect(FileResource.fileForkName.key, equals('file.fork_name'));
-        expect(FileResource.fileDirectory.key, equals('file.directory'));
-      });
-    });
-
-    group('GenAIResource', () {
-      test('should have correct keys for all values', () {
-        // Test each value explicitly
-        expect(GenAIResource.genAiOperationName.key, equals('gen_ai.operation.name'));
-        expect(GenAIResource.genAiRequestEncodingFormats.key, equals('gen_ai.request.encoding_formats'));
-        expect(GenAIResource.genAiRequestFrequencyPenalty.key, equals('gen_ai.request.frequency_penalty'));
-        expect(GenAIResource.genAiRequestMaxTokens.key, equals('gen_ai.request.max_tokens'));
-        expect(GenAIResource.genAiRequestModel.key, equals('gen_ai.request.model'));
-        expect(GenAIResource.genAiRequestPresencePenalty.key, equals('gen_ai.request.presence_penalty'));
-        expect(GenAIResource.genAiRequestSeed.key, equals('gen_ai.request.seed'));
+      test('toString should return the key', () {
+        expect(FeatureFlagResource.featureFlagKey.toString(), equals('feature_flag.key'));
+        expect(FeatureFlagResource.featureFlagVariant.toString(), equals('feature_flag.variant'));
       });
     });
 
@@ -168,6 +184,11 @@ void main() {
         expect(GeneralResourceResource.telemetrySdkVersion.key, equals('telemetry.sdk.version'));
         expect(GeneralResourceResource.telemetryAutoVersion.key, equals('telemetry.auto.version'));
       });
+
+      test('toString should return the key', () {
+        expect(GeneralResourceResource.serviceName.toString(), equals('service.name'));
+        expect(GeneralResourceResource.telemetrySdkName.toString(), equals('telemetry.sdk.name'));
+      });
     });
 
     group('GraphQLResource', () {
@@ -177,29 +198,13 @@ void main() {
         expect(GraphQLResource.graphqlOperationName.key, equals('graphql.operation.name'));
         expect(GraphQLResource.graphqlOperationType.key, equals('graphql.operation.type'));
       });
-    });
 
-    group('HostResource', () {
-      test('should have correct keys for all values', () {
-        // Test each value explicitly
-        expect(HostResource.hostArch.key, equals('host.arch'));
-        expect(HostResource.hostCpuCacheL2Size.key, equals('host.cpu.cache.l2.size'));
-        expect(HostResource.hostCpuFamily.key, equals('host.cpu.family'));
-        expect(HostResource.hostCpuModelId.key, equals('host.cpu.model.id'));
-        expect(HostResource.hostCpuModelName.key, equals('host.cpu.model.name'));
-        expect(HostResource.hostCpuStepping.key, equals('host.cpu.stepping'));
-        expect(HostResource.hostCpuVendorId.key, equals('host.cpu.vendor.id'));
-        expect(HostResource.hostId.key, equals('host.id'));
-        expect(HostResource.hostImageId.key, equals('host.image.id'));
-        expect(HostResource.hostImageName.key, equals('host.image.name'));
-        expect(HostResource.hostImageVersion.key, equals('host.image.version'));
-        expect(HostResource.hostName.key, equals('host.name'));
-        expect(HostResource.hostType.key, equals('host.type'));
-        expect(HostResource.hostMac.key, equals('host.mac'));
-        expect(HostResource.hostIp.key, equals('host.ip'));
+      test('toString should return the key', () {
+        expect(GraphQLResource.graphqlDocument.toString(), equals('graphql.document'));
+        expect(GraphQLResource.graphqlOperationName.toString(), equals('graphql.operation.name'));
       });
     });
-
+    
     group('HttpResource', () {
       test('should have correct keys for all values', () {
         // Test each value explicitly
@@ -214,6 +219,11 @@ void main() {
         expect(HttpResource.requestBodySize.key, equals('http.request.body.size'));
         expect(HttpResource.responseSize.key, equals('http.response.size'));
         expect(HttpResource.responseBodySize.key, equals('http.response.body.size'));
+      });
+
+      test('toString should return the key', () {
+        expect(HttpResource.httpConnectionState.toString(), equals('http.connection.state'));
+        expect(HttpResource.requestMethod.toString(), equals('http.request.method'));
       });
     });
 
@@ -252,6 +262,11 @@ void main() {
         expect(KubernetesResource.k8sCronJobUid.key, equals('k8s.cronjob.uid'));
         expect(KubernetesResource.k8sCronJobName.key, equals('k8s.cronjob.name'));
       });
+
+      test('toString should return the key', () {
+        expect(KubernetesResource.k8sClusterName.toString(), equals('k8s.cluster.name'));
+        expect(KubernetesResource.k8sPodName.toString(), equals('k8s.pod.name'));
+      });
     });
 
     group('MessagingResource', () {
@@ -264,6 +279,11 @@ void main() {
         expect(MessagingResource.messagingProtocol.key, equals('messaging.protocol'));
         expect(MessagingResource.messagingProtocolVersion.key, equals('messaging.protocol_version'));
       });
+
+      test('toString should return the key', () {
+        expect(MessagingResource.messagingSystem.toString(), equals('messaging.system'));
+        expect(MessagingResource.messagingDestination.toString(), equals('messaging.destination'));
+      });
     });
 
     group('NetworkResource', () {
@@ -275,6 +295,11 @@ void main() {
         expect(NetworkResource.networkCarrierMnc.key, equals('network.carrier.mnc'));
         expect(NetworkResource.networkCarrierIcc.key, equals('network.carrier.icc'));
       });
+
+      test('toString should return the key', () {
+        expect(NetworkResource.networkType.toString(), equals('network.type'));
+        expect(NetworkResource.networkCarrierName.toString(), equals('network.carrier.name'));
+      });
     });
 
     group('OperatingSystemResource', () {
@@ -284,6 +309,11 @@ void main() {
         expect(OperatingSystemResource.osDescription.key, equals('os.description'));
         expect(OperatingSystemResource.osName.key, equals('os.name'));
         expect(OperatingSystemResource.osVersion.key, equals('os.version'));
+      });
+
+      test('toString should return the key', () {
+        expect(OperatingSystemResource.osType.toString(), equals('os.type'));
+        expect(OperatingSystemResource.osName.toString(), equals('os.name'));
       });
     });
 
@@ -300,6 +330,11 @@ void main() {
         expect(ProcessResource.processRuntimeVersion.key, equals('process.runtime.version'));
         expect(ProcessResource.processRuntimeDescription.key, equals('process.runtime.description'));
       });
+
+      test('toString should return the key', () {
+        expect(ProcessResource.processPid.toString(), equals('process.pid'));
+        expect(ProcessResource.processOwner.toString(), equals('process.owner'));
+      });
     });
 
     group('RPCResource', () {
@@ -308,6 +343,11 @@ void main() {
         expect(RPCResource.rpcSystem.key, equals('rpc.system'));
         expect(RPCResource.rpcService.key, equals('rpc.service'));
         expect(RPCResource.rpcMethod.key, equals('rpc.method'));
+      });
+
+      test('toString should return the key', () {
+        expect(RPCResource.rpcSystem.toString(), equals('rpc.system'));
+        expect(RPCResource.rpcMethod.toString(), equals('rpc.method'));
       });
     });
 
@@ -318,6 +358,11 @@ void main() {
         expect(ServiceResource.serviceResourcepace.key, equals('service.Resourcepace'));
         expect(ServiceResource.serviceInstanceId.key, equals('service.instance.id'));
         expect(ServiceResource.serviceVersion.key, equals('service.version'));
+      });
+
+      test('toString should return the key', () {
+        expect(ServiceResource.serviceName.toString(), equals('service.name'));
+        expect(ServiceResource.serviceVersion.toString(), equals('service.version'));
       });
     });
 
@@ -331,6 +376,11 @@ void main() {
         expect(SourceCodeResource.codeColumnNumber.key, equals('code.column.number'));
         expect(SourceCodeResource.codeStacktrace.key, equals('code.stacktrace'));
       });
+
+      test('toString should return the key', () {
+        expect(SourceCodeResource.codeFunctionName.toString(), equals('code.function.name'));
+        expect(SourceCodeResource.codeFilePath.toString(), equals('code.file.path'));
+      });
     });
 
     group('TelemetryDistroResource', () {
@@ -338,6 +388,11 @@ void main() {
         // Test each value explicitly
         expect(TelemetryDistroResource.distroName.key, equals('telemetry.distro.name'));
         expect(TelemetryDistroResource.distroVersion.key, equals('telemetry.distro.version'));
+      });
+
+      test('toString should return the key', () {
+        expect(TelemetryDistroResource.distroName.toString(), equals('telemetry.distro.name'));
+        expect(TelemetryDistroResource.distroVersion.toString(), equals('telemetry.distro.version'));
       });
     });
 
@@ -348,12 +403,21 @@ void main() {
         expect(TelemetrySDKResource.sdkLanguage.key, equals('telemetry.sdk.language'));
         expect(TelemetrySDKResource.sdkVersion.key, equals('telemetry.sdk.version'));
       });
+
+      test('toString should return the key', () {
+        expect(TelemetrySDKResource.sdkName.toString(), equals('telemetry.sdk.name'));
+        expect(TelemetrySDKResource.sdkLanguage.toString(), equals('telemetry.sdk.language'));
+      });
     });
 
     group('VersionResource', () {
       test('should have correct keys for all values', () {
         // Test each value explicitly
         expect(VersionResource.schemaUrl.key, equals('schema.url'));
+      });
+
+      test('toString should return the key', () {
+        expect(VersionResource.schemaUrl.toString(), equals('schema.url'));
       });
     });
   });

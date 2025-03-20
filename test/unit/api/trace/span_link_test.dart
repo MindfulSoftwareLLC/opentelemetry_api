@@ -1,11 +1,7 @@
 // Licensed under the Apache License, Version 2.0
 // Copyright 2025, Michael Bushe, All rights reserved.
 
-import 'package:opentelemetry_api/src/api/common/attributes.dart';
-import 'package:opentelemetry_api/src/api/otel_api.dart';
-import 'package:opentelemetry_api/src/api/trace/span.dart';
-import 'package:opentelemetry_api/src/api/trace/tracer.dart';
-import 'package:opentelemetry_api/src/api/trace/tracer_provider.dart';
+import 'package:opentelemetry_api/opentelemetry_api.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -22,7 +18,7 @@ void main() {
       );
 
       tracerProvider = OTelAPI.tracerProvider();
-      tracer = tracerProvider.getTracer('test-tracer');
+      tracer = tracerProvider.getTracer(name: 'test-tracer');
     });
 
     tearDown(() async {
@@ -31,14 +27,14 @@ void main() {
 
     test('creates span with links at creation time', () {
       // Create two spans to link to
-      final span1 = tracer.startSpan('span-1');
-      final span2 = tracer.startSpan('span-2');
+      final span1 = tracer.startSpan(name: 'span-1');
+      final span2 = tracer.startSpan(name: 'span-2');
 
       final attributes = {'key': 'value'}.toAttributes();
 
       // Create a span with links to both spans
       final linkedSpan = tracer.startSpan(
-        'linked-span',
+        name: 'linked-span',
         links: [
           OTelAPI.spanLink(span1.spanContext, attributes),
           OTelAPI.spanLink(span2.spanContext, attributes),
@@ -52,8 +48,8 @@ void main() {
     });
 
     test('adds links after span creation', () {
-      final span1 = tracer.startSpan('span-1');
-      final mainSpan = tracer.startSpan('main-span');
+      final span1 = tracer.startSpan(name: 'span-1');
+      final mainSpan = tracer.startSpan(name: 'main-span');
 
       final attributes = {'key': 'value'}.toAttributes();
       mainSpan.addLink(span1.spanContext, attributes);
@@ -64,11 +60,11 @@ void main() {
     });
 
     test('preserves link order', () {
-      final span1 = tracer.startSpan('span-1');
-      final span2 = tracer.startSpan('span-2');
-      final span3 = tracer.startSpan('span-3');
+      final span1 = tracer.startSpan(name: 'span-1');
+      final span2 = tracer.startSpan(name: 'span-2');
+      final span3 = tracer.startSpan(name: 'span-3');
 
-      final mainSpan = tracer.startSpan('main-span');
+      final mainSpan = tracer.startSpan(name: 'main-span');
       mainSpan.addLink(span1.spanContext);
       mainSpan.addLink(span2.spanContext);
       mainSpan.addLink(span3.spanContext);
@@ -80,13 +76,13 @@ void main() {
     });
 
     test('handles links with empty trace IDs or span IDs', () {
-      final invalidContext = OTelAPI.spanContextInvalid();
+      final invalidContext = SpanContext.invalid();
       final attributes = {'key': 'value'}.toAttributes();
 
       // Should still record the link even with invalid context if attributes are present
       final span = tracer.startSpan(
-        'test-span',
-        links: [OTelAPI.spanLink(invalidContext, attributes)],
+        name: 'test-span',
+        links: [SpanLink(invalidContext, attributes)],
       );
 
       expect(span.spanLinks, hasLength(1));
@@ -95,7 +91,7 @@ void main() {
     });
 
     test('isRecording behavior', () {
-      final span = tracer.startSpan('test-span');
+      final span = tracer.startSpan(name: 'test-span');
       expect(span.isRecording, isTrue);
 
       // After ending the span, it should become non-recording
@@ -103,14 +99,14 @@ void main() {
       expect(span.isRecording, isFalse);
 
       // Operations after end should be ignored
-      span.addEvent( OTelAPI.spanEvent('test-event'));
+      span.addEvent(OTelAPI.spanEvent(name: 'test-event'));
       span.setStatus(SpanStatusCode.Error);
       expect(span.spanEvents, isNull);
       expect(span.status, equals(SpanStatusCode.Ok)); // Status should remain unchanged
     });
 
     test('status setting rules', () {
-      final span = tracer.startSpan('test-span');
+      final span = tracer.startSpan(name: 'test-span');
 
       // Initial status should be unset
       expect(span.status, equals(SpanStatusCode.Unset));
@@ -136,7 +132,7 @@ void main() {
     });
 
     test('description only allowed with error status', () {
-      final span = tracer.startSpan('test-span');
+      final span = tracer.startSpan(name: 'test-span');
 
       // Description should be ignored for unset status
       span.setStatus(SpanStatusCode.Unset, 'Description');
