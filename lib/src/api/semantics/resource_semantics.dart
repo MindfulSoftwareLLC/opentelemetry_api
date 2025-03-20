@@ -177,7 +177,7 @@ enum ExceptionResource implements OTelSemantic {
 
 // Feature Flag Semantic Resource
 /// [Specification](https://opentelemetry.io/docs/specs/semconv/attributes-registry/feature-flag/)
-enum FeatureFlagResource {
+enum FeatureFlagResource implements OTelSemantic {
   featureFlagKey("feature_flag.key"),
   featureFlagVariant("feature_flag.variant"),
   featureFlagProviderName("feature_flag.provider_name"),
@@ -187,6 +187,7 @@ enum FeatureFlagResource {
   featureFlagSetId("feature_flag.set.id"),
   featureFlagVersion("feature_flag.version");
 
+  @override
   final String key;
 
   @override
