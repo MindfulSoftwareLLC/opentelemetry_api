@@ -97,9 +97,6 @@ class APITracer {
     List<SpanLink>? links,
     bool? isRecording = true,
   }) {
-    // Get current context and determine parent
-    final contextOfSpan = context ?? Context.current;
-
     var span = createSpan(
         name: name,
         spanContext: spanContext,
@@ -107,11 +104,11 @@ class APITracer {
         kind: kind,
         attributes: attributes,
         links: links,
-        context: contextOfSpan,
+        context: context,
         isRecording: isRecording);
 
     // Set the span in context and ensure it's properly propagated
-    Context.current = contextOfSpan.setCurrentSpan(span);
+    Context.current = (context ?? Context.current).setCurrentSpan(span);
     return span;
   }
 
@@ -247,8 +244,13 @@ class APITracer {
         );
       } else if (effectiveParentSpan != null) {
         // Create child context from parent
-        effectiveSpanContext = OTelFactory.otelFactory!
-            .spanContextFromParent(effectiveParentSpan.spanContext);
+        effectiveSpanContext = OTelFactory.otelFactory!.spanContext(
+          traceId: effectiveParentSpan.spanContext.traceId,
+          spanId: OTelFactory.otelFactory!.spanId(),
+          parentSpanId: effectiveParentSpan.spanContext.spanId,
+          traceFlags: effectiveParentSpan.spanContext.traceFlags,
+          traceState: effectiveParentSpan.spanContext.traceState,
+        );
       } else {
         // Create new root context
         effectiveSpanContext = OTelFactory.otelFactory!.spanContext(
@@ -260,10 +262,24 @@ class APITracer {
     }
 
     // Validate parent span and span context compatibility
-    if (parentSpan != null &&
-        effectiveSpanContext.traceId != parentSpan.spanContext.traceId) {
-      throw ArgumentError(
-          'Parent and child span context traceIds must be the same');
+    if (parentSpan != null) {
+      if (effectiveSpanContext.traceId != parentSpan.spanContext.traceId) {
+        throw ArgumentError('Parent and child span context traceIds must be the same');
+      }
+      
+      // Ensure child context has a proper parent span ID reference
+      if (effectiveSpanContext.parentSpanId == null || 
+          effectiveSpanContext.parentSpanId.toString() != parentSpan.spanContext.spanId.toString()) {
+        // Create a new span context with the proper parent span ID
+        effectiveSpanContext = OTelFactory.otelFactory!.spanContext(
+          traceId: effectiveSpanContext.traceId,
+          spanId: effectiveSpanContext.spanId,
+          parentSpanId: parentSpan.spanContext.spanId,
+          traceFlags: effectiveSpanContext.traceFlags,
+          traceState: effectiveSpanContext.traceState,
+          isRemote: effectiveSpanContext.isRemote
+        );
+      }
     }
 
     var apiSpan = APISpanCreate.create(

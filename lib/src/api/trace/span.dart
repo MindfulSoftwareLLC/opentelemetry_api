@@ -119,6 +119,10 @@ class APISpan {
   /// Root spans have no SpanContext.
   SpanContext get spanContext => _spanContext;
 
+  /// Returns whether this span context is valid
+  /// A span context is valid when it has a non-zero traceId and a non-zero spanId.
+  bool get isValid => spanContext.isValid;
+
   /// Returns the parent span, if any.
   /// Root spans have no parent.
   APISpan? get parentSpan => _parentSpan;

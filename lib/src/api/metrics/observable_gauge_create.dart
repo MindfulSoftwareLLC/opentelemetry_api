@@ -16,7 +16,7 @@ class ObservableGaugeCreate {
     String? description,
     required bool enabled,
     required APIMeter meter,
-    ObservableCallback? callback,
+    ObservableCallback<T>? callback,
   }) {
     return APIObservableGauge<T>(
       name,

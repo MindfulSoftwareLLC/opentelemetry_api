@@ -1,6 +1,6 @@
 name: opentelemetry_api
 description: Dartastic.io's OpenTelemetry API for Dart following the OpenTelemetry specification.
-version: 1.0.1
+version: 0.8.0
 repository: https://github.com/MindfulSoftwareLLC/opentelemetry_api.git
 homepage: https://dartastic.io
 #publish_to: https://dartastic-pubserver-6djqlrsgkq-uc.a.run.app
@@ -19,4 +19,4 @@ dev_dependencies:
   lints: ^5.1.1
   test: ^1.25.15
   coverage: ^1.11.1
-  protoc_plugin: ^21.1.2  # For generating Dart proto files
+  protoc_plugin: ^21.1.2

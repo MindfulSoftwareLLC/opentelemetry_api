@@ -2,7 +2,6 @@
 // Copyright 2025, Michael Bushe, All rights reserved.
 
 import 'package:opentelemetry_api/opentelemetry_api.dart';
-import 'package:opentelemetry_api/src/api/semantics/resource_semantics.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -34,14 +33,14 @@ void main() {
         expect(mapEntry.key, equals(resource.key));
         expect(mapEntry.value, equals(value));
       }
-      
+
       // Test with different value types
       final intValue = 42;
       expect(ClientResource.clientPort.toMapEntry(intValue).value, equals(intValue));
-      
+
       final boolValue = true;
       expect(ClientResource.clientAddress.toMapEntry(boolValue).value, equals(boolValue));
-      
+
       final listValue = [1, 2, 3];
       expect(ClientResource.clientAddress.toMapEntry(listValue).value, equals(listValue));
     });
@@ -267,11 +266,11 @@ void main() {
       // Test uppercase header names
       final upperCaseHeader = HttpHeaderAttribute.request('Content-Type');
       expect(upperCaseHeader.key, equals('http.request.header.content-type'));
-      
+
       // Test mixed case header names
       final mixedCaseHeader = HttpHeaderAttribute.response('Content-Length');
       expect(mixedCaseHeader.key, equals('http.response.header.content-length'));
-      
+
       // Test with special characters
       final specialHeader = HttpHeaderAttribute.request('x-correlation-id');
       expect(specialHeader.key, equals('http.request.header.x-correlation-id'));

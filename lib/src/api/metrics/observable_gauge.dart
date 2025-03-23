@@ -19,10 +19,10 @@ class APIObservableGauge<T extends num> {
   final String? _unit;
   final bool _enabled;
   final APIMeter _meter;
-  final List<ObservableCallback> _callbacks = [];
+  final List<ObservableCallback<T>> _callbacks = [];
 
   /// Creates a new observable gauge instrument
-  APIObservableGauge(this._name, this._description, this._unit, this._enabled, this._meter, [ObservableCallback? callback]) {
+  APIObservableGauge(this._name, this._description, this._unit, this._enabled, this._meter, [ObservableCallback<T>? callback]) {
     if (callback != null) {
       addCallback(callback);
     }
@@ -44,16 +44,16 @@ class APIObservableGauge<T extends num> {
   APIMeter get meter => _meter;
 
   /// Returns the current list of callbacks registered to this instrument.
-  List<ObservableCallback> get callbacks => List.unmodifiable(_callbacks);
+  List<ObservableCallback<T>> get callbacks => List.unmodifiable(_callbacks);
 
   /// Registers a callback function that will be invoked when the instrument is observed.
-  APICallbackRegistration addCallback(ObservableCallback callback) {
+  APICallbackRegistration<T> addCallback(ObservableCallback<T> callback) {
     _callbacks.add(callback);
     return _CallbackRegistration(this, callback);
   }
 
   /// Removes a callback from this instrument.
-  void _removeCallback(ObservableCallback callback) {
+  void removeCallback(ObservableCallback<T> callback) {
     _callbacks.remove(callback);
   }
 
@@ -66,14 +66,14 @@ class APIObservableGauge<T extends num> {
 }
 
 /// Default implementation of [APICallbackRegistration].
-class _CallbackRegistration implements APICallbackRegistration {
-  final APIObservableGauge _instrument;
-  final ObservableCallback _callback;
+class _CallbackRegistration<T extends num> implements APICallbackRegistration<T> {
+  final APIObservableGauge<T> _instrument;
+  final ObservableCallback<T> _callback;
 
   _CallbackRegistration(this._instrument, this._callback);
 
   @override
   void unregister() {
-    _instrument._removeCallback(_callback);
+    _instrument.removeCallback(_callback);
   }
 }

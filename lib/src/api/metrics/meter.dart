@@ -192,7 +192,7 @@ class APIMeter {
     required String name,
     String? unit,
     String? description,
-    ObservableCallback? callback,
+    ObservableCallback<T>? callback,
   }) {
     if (name.isEmpty) {
       throw ArgumentError('ObservableUpDownCounter name must not be empty');
@@ -221,7 +221,7 @@ class APIMeter {
     required String name,
     String? unit,
     String? description,
-    ObservableCallback? callback,
+    ObservableCallback<T>? callback,
   }) {
     if (name.isEmpty) {
       throw ArgumentError('ObservableGauge name must not be empty');

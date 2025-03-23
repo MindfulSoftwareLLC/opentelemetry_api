@@ -20,7 +20,7 @@ class SpanContext {
   final SpanId? parentSpanId;
   final bool _isRemote;
 
-  SpanContext._({
+  SpanContext._({  
     required this.traceId,
     required this.traceFlags,
     required this.spanId,
@@ -30,8 +30,7 @@ class SpanContext {
   })  : _isRemote = isRemote;
 
 
-  bool get isValid => traceId.toString() != "00000000000000000000000000000000" &&
-      spanId.toString() != "0000000000000000";
+  bool get isValid => traceId.isValid  && spanId.isValid;
 
   bool get isRemote => _isRemote;
 
@@ -66,12 +65,12 @@ class SpanContext {
       'traceFlags': traceFlags.asByte,
       'isRemote': _isRemote,
     };
-    
-    // Only include parentSpanId if it exists and is valid
-    if (parentSpanId != null && parentSpanId!.isValid) {
+
+    // Always include parentSpanId
+    if (parentSpanId != null) {
       jsonMap['parentSpanId'] = parentSpanId!.toString();
     }
-    
+
     if (traceState != null) {
       jsonMap['traceState'] =  traceState!.entries;
     }
@@ -81,8 +80,8 @@ class SpanContext {
 
   factory SpanContext.fromJson(Map<String, dynamic> json) {
     if (OTelFactory.otelFactory == null) throw StateError('Call initialize() first.');
-    
-    SpanId? parentSpanId = null;
+
+    SpanId? parentSpanId;
     if (json['parentSpanId'] != null) {
       final parentId = OTelAPI.spanIdFrom(json['parentSpanId'] as String);
       // Only set parentSpanId if it's valid (not all zeros)
@@ -90,7 +89,7 @@ class SpanContext {
         parentSpanId = parentId;
       }
     }
-    
+
     return OTelAPI.spanContext(
       traceId: OTelAPI.traceIdFrom(json['traceId'] as String),
       spanId: OTelAPI.spanIdFrom(json['spanId'] as String),

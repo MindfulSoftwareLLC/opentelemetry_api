@@ -15,8 +15,54 @@ part 'attributes_create.dart';
 class Attributes {
   final Map<String, Attribute> _entries = {};
 
-  static of(Map<String, String> map) {
+  static of(Map<String, Object> map) {
     return OTelAPIFactory.attrsFromMap(map);
+  }
+
+  /// Creates an Attributes instance from a JSON map.
+  /// This is a utility method for deserialization from logs or exports.
+  static Attributes fromJson(Map<String, dynamic> json) {
+    final attributes = <Attribute>[];
+
+    for (final entry in json.entries) {
+      final key = entry.key;
+      final value = entry.value;
+
+      if (value is String) {
+        attributes.add(AttributeCreate.create(key, value));
+      } else if (value is bool) {
+        attributes.add(AttributeCreate.create(key, value));
+      } else if (value is int) {
+        attributes.add(AttributeCreate.create(key, value));
+      } else if (value is double) {
+        attributes.add(AttributeCreate.create(key, value));
+      } else if (value is List<String>) {
+        attributes.add(AttributeCreate.create(key, value));
+      } else if (value is List<bool>) {
+        attributes.add(AttributeCreate.create(key, value));
+      } else if (value is List<int>) {
+        attributes.add(AttributeCreate.create(key, value));
+      } else if (value is List<double>) {
+        attributes.add(AttributeCreate.create(key, value));
+      } else if (value is List) {
+        // Try to convert the list to a supported type
+        if (value.isNotEmpty) {
+          if (value.every((e) => e is String)) {
+            attributes.add(AttributeCreate.create(key, value.cast<String>()));
+          } else if (value.every((e) => e is bool)) {
+            attributes.add(AttributeCreate.create(key, value.cast<bool>()));
+          } else if (value.every((e) => e is int)) {
+            attributes.add(AttributeCreate.create(key, value.cast<int>()));
+          } else if (value.every((e) => e is double || e is int)) {
+            // Convert all to double
+            attributes.add(AttributeCreate.create(key, value.map((e) => e is int ? e.toDouble() : e as double).toList()));
+          }
+        }
+      }
+      // Other types are ignored
+    }
+
+    return AttributesCreate.create(attributes);
   }
 
   /// Private constructor to enforce immutability.
@@ -168,6 +214,16 @@ class Attributes {
 
   @override
   int get hashCode => const MapEquality<String, Attribute>().hash(_entries);
+
+  /// Converts the attributes to a JSON-serializable map.
+  /// This is useful for logging or debugging.
+  Map<String, dynamic> toJson() {
+    final result = <String, dynamic>{};
+    for (final entry in _entries.entries) {
+      result[entry.key] = entry.value.value;
+    }
+    return result;
+  }
 }
 
 /// Extension to create Attributes from a simple Map

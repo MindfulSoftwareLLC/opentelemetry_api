@@ -312,13 +312,13 @@ class Context {
           // If we get here, the value is serializable
           // Handle multiple keys with the same name
           String finalKeyName = key.name;
-          
+
           // If we've seen this key name before, make it unique
           keyNamesCount[key.name] = (keyNamesCount[key.name] ?? 0) + 1;
           if (keyNamesCount[key.name]! > 1) {
             finalKeyName = '${key.name}-${keyNamesCount[key.name]}';
           }
-          
+
           // Create a composite key entry that includes both name and uniqueId
           values[finalKeyName] = {
             'value': value,
@@ -362,18 +362,16 @@ class Context {
         if (value is Map<String, dynamic> && value.containsKey('uniqueId')) {
           final uniqueIdList =
               Uint8List.fromList((value['uniqueId'] as List).cast<int>());
-          
+
           // Get the original key name if available, otherwise use the key
-          final keyName = value.containsKey('originalKeyName') ? 
+          final keyName = value.containsKey('originalKeyName') ?
               value['originalKeyName'] as String : key;
-              
-          // Extract just the base key name in case it has a suffix like "mixed-key-2"      
-          final baseKeyName = keyName.contains('-') ? 
-              keyName.substring(0, keyName.lastIndexOf('-')) : keyName;
-          
+
+          // Note: Two keys with same name but different uniqueIds are valid and distinct
+
           // Recreate the context key with the same name and uniqueId
           final contextKey = OTelFactory.otelFactory!.contextKey(
-            baseKeyName,
+            keyName,
             uniqueIdList,
           );
           context = context.copyWith(contextKey, value['value']);
@@ -402,9 +400,9 @@ class Context {
     // Sort the keys for consistency
     final sortedEntries = _values.entries.toList()
       ..sort((a, b) => a.key.toString().compareTo(b.key.toString()));
-    
+
     return Object.hashAll([
-      for (final entry in sortedEntries) 
+      for (final entry in sortedEntries)
         Object.hash(entry.key, entry.value)
     ]);
   }

@@ -24,7 +24,7 @@ class APIMeterProvider {
   String _endpoint;
   String _serviceName;
   String? _serviceVersion;
-  bool _enabled;
+  bool _enabled = false; // API, SDK defaults true
   bool _isShutdown;
 
   // Cache for created meters, keyed by _MeterKey.

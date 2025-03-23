@@ -44,10 +44,10 @@ class APIObservableCounter<T extends num> {
   APIMeter get meter => _meter;
 
   /// Returns the current list of callbacks registered to this instrument.
-  List<ObservableCallback> get callbacks => List.unmodifiable(_callbacks);
+  List<ObservableCallback<T>> get callbacks => List.unmodifiable(_callbacks);
 
   /// Registers a callback function that will be invoked when the instrument is observed.
-  APICallbackRegistration addCallback(ObservableCallback<T> callback) {
+  APICallbackRegistration<T> addCallback(ObservableCallback<T> callback) {
     _callbacks.add(callback);
     return _CallbackRegistration<T>(this, callback);
   }

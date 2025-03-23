@@ -6,7 +6,7 @@ part of 'observable_up_down_counter.dart';
 
 /// Factory methods for creating [APIObservableUpDownCounter] instances.
 /// This is part of the observable_up_down_counter.dart file to keep related code together.
-class ObservableUpDownCounterCreate {
+class ObservableUpDownCounterCreate<T extends num> {
   /// Creates a new [APIObservableUpDownCounter] instance.
   /// This is an implementation detail and should not be used directly.
   /// Use [APIMeter.createObservableUpDownCounter()] instead.
@@ -16,7 +16,7 @@ class ObservableUpDownCounterCreate {
     String? description,
     required bool enabled,
     required APIMeter meter,
-    ObservableCallback? callback,
+    ObservableCallback<T>? callback,
   }) {
     return APIObservableUpDownCounter<T>(
       name,
