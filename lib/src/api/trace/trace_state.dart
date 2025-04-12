@@ -42,7 +42,6 @@ class TraceState {
     return OTelFactory.otelFactory!.traceState(entries);
   }
 
-  // TODO - move
   /// Creates a new [TraceState] from a list of key-value pairs.
   factory TraceState.fromMap(Map<String, String> entries) {
     if (OTelFactory.otelFactory == null) throw StateError('Call initialize() first.');

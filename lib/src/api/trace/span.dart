@@ -382,8 +382,6 @@ class APISpan {
     try {
       exceptionMessage = exception.toString();
     } catch (e) {
-      //TODO - set a print function
-      print('Exception when calling toString on the exception.');
       exceptionMessage =
           'Exception when calling toString of span exception: $e';
     }

@@ -29,10 +29,10 @@ class Context {
 
   /// The root context with no values
   static Context get root {
-    return _rootContext ??= _getAndCacheOtelFactory().context();
+    return _rootContext ??= _getAndCacheOTelFactory().context();
   }
 
-  static OTelFactory _getAndCacheOtelFactory() {
+  static OTelFactory _getAndCacheOTelFactory() {
     if (_otelFactory != null) {
       return _otelFactory!;
     }
@@ -108,7 +108,7 @@ class Context {
   // current context with empty Baggage, sets it to Context.current and
   // returns it.
   static Context currentWithBaggage() {
-    _getAndCacheOtelFactory();
+    _getAndCacheOTelFactory();
     if (Context.current.baggage == null) {
       Context.current = Context.current.copyWithBaggage(OTelFactory.otelFactory!.baggage({}));
     }
@@ -208,7 +208,7 @@ class Context {
   Context copyWithValue<T>(String name, T contextValue) {
     return ContextCreate.create(contextMap: {
       ..._values,
-      _getAndCacheOtelFactory()
+      _getAndCacheOTelFactory()
           .contextKey<T>(name, ContextKey.generateContextKeyId()): contextValue,
     });
   }
@@ -253,7 +253,7 @@ class Context {
   }
 
   Future<T> runIsolate<T>(Future<T> Function() computation) async {
-    final oldFactory = _getAndCacheOtelFactory();
+    final oldFactory = _getAndCacheOTelFactory();
     // Capture the parent's factory configuration and serialize it.
     final serializedFactory = oldFactory.serialize();
 
@@ -335,7 +335,7 @@ class Context {
   }
 
   static Context deserialize(Map<String, dynamic> values) {
-    _getAndCacheOtelFactory();
+    _getAndCacheOTelFactory();
     var context = _otelFactory!.context();
 
     // Handle baggage if present and not empty

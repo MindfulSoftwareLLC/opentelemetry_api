@@ -16,6 +16,9 @@ class Attributes {
   final Map<String, Attribute> _entries = {};
 
   static of(Map<String, Object> map) {
+    //Note that this directly uses the API factory, not the installed factory
+    //This is to allow the creation of attributes for initialization and is
+    //ok since Attributes is unlikely to be overridden by the SDK.
     return OTelAPIFactory.attrsFromMap(map);
   }
 
