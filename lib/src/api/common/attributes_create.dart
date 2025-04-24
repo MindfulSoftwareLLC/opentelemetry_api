@@ -4,7 +4,6 @@
 part of attributes;
 
 class AttributesCreate {
-  //TODO Map<String, Attribute<Object>> ?
   static Attributes create<T>(List<Attribute> entries) {
     return Attributes._(entries);
   }

@@ -25,8 +25,8 @@ void main() {
 
       // Assert
       expect(tracer.name, equals('test-tracer'));
-      expect(tracer.version, equals('1.42.0.0')); // Default version should be applied
-      expect(tracer.schemaUrl, equals('https://opentelemetry.io/schemas/1.11.0')); // Default schema should be applied
+      expect(tracer.version, equals('1.11.0.0')); // Default version should be applied
+      expect(tracer.schemaUrl, equals(OTelAPI.defaultSchemaUrl)); // Default schema should be applied
       expect(tracer.attributes, isNull);
     });
 

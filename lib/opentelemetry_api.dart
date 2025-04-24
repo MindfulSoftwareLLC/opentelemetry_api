@@ -54,3 +54,5 @@ export 'src/api/trace/trace_state.dart';
 export 'src/api/trace/tracer.dart';
 export 'src/api/trace/tracer_provider.dart';
 export 'src/api/common/instrumentation_scope.dart';
+// Util
+export 'src/util/otel_log.dart';

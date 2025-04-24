@@ -8,7 +8,7 @@ import 'package:opentelemetry_api/opentelemetry_api.dart';
 
 /// The API does nothing on it's own, it's more typical to use the SDK.
 /// However, as required vby the OpenTelementry Specification, the API
-/// works (as a no-op) without the
+/// works (as a no-op) without the SDK installed.
 void main() {
   OTelAPI.initialize(endpoint: 'http://localhost:4317');
   Attribute<String> stringAttribute = OTelAPI.attributeString('example_string_key', 'foo');

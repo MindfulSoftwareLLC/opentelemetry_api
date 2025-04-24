@@ -16,6 +16,7 @@ import 'package:opentelemetry_api/src/api/metrics/gauge.dart';
 import 'package:opentelemetry_api/src/api/metrics/histogram.dart';
 import 'package:opentelemetry_api/src/api/metrics/up_down_counter.dart';
 
+import '../../opentelemetry_api.dart' show OTelAPI;
 import '../api/baggage/baggage.dart';
 import '../api/baggage/baggage_entry.dart';
 import '../api/common/attribute.dart';
@@ -39,9 +40,6 @@ typedef OTelFactoryCreationFunction = OTelFactory Function(
 /// SDK installed.  The API uses the `OTelAPIFactory` as a default.
 /// SDKs override this default by registering their own APIFactory
 abstract class OTelFactory {
-  static const defaultServiceName = "@dart/opentelemetry_api";
-  static const defaultServiceVersion =
-      '1.42.0.0'; //matches the OTel spec number, plus version for this library
   static const defaultEndpoint = 'http://localhost:4317';
 
   /// SDKs must replace this otelFactory with their own to get the SDK
@@ -289,8 +287,8 @@ abstract class OTelFactory {
 
   void reset() {
     _apiEndpoint = defaultEndpoint;
-    _apiServiceName = defaultServiceName;
-    _apiServiceVersion = defaultServiceVersion;
+    _apiServiceName = OTelAPI.defaultServiceName;
+    _apiServiceVersion = OTelAPI.defaultServiceVersion;
     _globalDefaultTracerProvider = null;
     _globalDefaultMeterProvider = null;
     _tracerProviders?.clear();

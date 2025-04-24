@@ -14,6 +14,10 @@ import '../../opentelemetry_api.dart';
 /// [OTelFactory] to [OTelAPIFactory].
 /// The rest of the methods act like factory constructors for OTelAPI classes.
 class OTelAPI {
+  static const String defaultServiceName = '@dart/opentelemetry_api';
+  static const String defaultServiceVersion = '1.11.0.0';
+  static const String defaultSchemaUrl = 'https://opentelemetry.io/schemas/1.11.0';
+
   static OTelFactory? _otelFactory;
 
   /// Typically developers will want to initialize [OTel] (the SDK),
@@ -37,8 +41,8 @@ class OTelAPI {
   /// sets this factory to an SDK factory, which is the typical usage.
   static void initialize(
       {String endpoint = OTelFactory.defaultEndpoint,
-      String? serviceName = OTelFactory.defaultServiceName,
-      String? serviceVersion = OTelFactory.defaultServiceVersion,
+      String? serviceName = OTelAPI.defaultServiceName,
+      String? serviceVersion = OTelAPI.defaultServiceVersion,
       OTelFactoryCreationFunction? oTelFactoryCreationFunction}) {
     if (OTelFactory.otelFactory != null) {
       throw StateError(

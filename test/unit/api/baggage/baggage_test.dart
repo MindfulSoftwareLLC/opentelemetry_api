@@ -241,5 +241,60 @@ void main() {
         baggage.copyWithout('key');
       }, throwsStateError);
     });
+
+
+    test('baggage creation and manipulation', () {
+      // Create entries
+      final entry1 = OTelAPI.baggageEntry('value1', 'metadata1');
+      final entry2 = OTelAPI.baggageEntry('value2', 'metadata2');
+
+      // Create baggage with entries
+      final baggage = OTelAPI.baggage({
+        'key1': entry1,
+        'key2': entry2,
+      });
+
+      // Verify entries
+      expect(baggage.getEntry('key1')?.value, equals('value1'));
+      expect(baggage.getEntry('key1')?.metadata, equals('metadata1'));
+      expect(baggage.getEntry('key2')?.value, equals('value2'));
+      expect(baggage.getEntry('key2')?.metadata, equals('metadata2'));
+    });
+
+    test('baggageForMap creates baggage from key-value pairs', () {
+      final map = {
+        'key1': 'value1',
+        'key2': 'value2',
+      };
+
+      final baggage = OTelAPI.baggageForMap(map);
+
+      expect(baggage.getEntry('key1')?.value, equals('value1'));
+      expect(baggage.getEntry('key2')?.value, equals('value2'));
+      // No metadata provided
+      expect(baggage.getEntry('key1')?.metadata, isNull);
+      expect(baggage.getEntry('key2')?.metadata, isNull);
+    });
+
+    test('baggageFromJson creates baggage from JSON', () {
+      final json = {
+        'key1': {'value': 'value1', 'metadata': 'metadata1'},
+        'key2': {'value': 'value2', 'metadata': 'metadata2'},
+        'key3': {'metadata': 'metadata3'}, // Invalid entry, missing value
+        'key4': 'not-an-object' // Invalid entry, not an object
+      };
+
+      final baggage = OTelAPI.baggageFromJson(json);
+
+      // Valid entries are included
+      expect(baggage.getEntry('key1')?.value, equals('value1'));
+      expect(baggage.getEntry('key1')?.metadata, equals('metadata1'));
+      expect(baggage.getEntry('key2')?.value, equals('value2'));
+      expect(baggage.getEntry('key2')?.metadata, equals('metadata2'));
+
+      // Invalid entries are skipped
+      expect(baggage.getEntry('key3'), isNull);
+      expect(baggage.getEntry('key4'), isNull);
+    });
   });
 }

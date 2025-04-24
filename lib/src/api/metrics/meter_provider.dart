@@ -3,6 +3,7 @@
 
 // ignore_for_file: unnecessary_getters_setters
 
+import '../../../opentelemetry_api.dart' show OTelAPI, OTelLog;
 import '../common/attributes.dart';
 import 'meter.dart';
 
@@ -36,8 +37,8 @@ class APIMeterProvider {
   /// var meterProvider = OTelFactory.meterProvider();
   APIMeterProvider._({
     required String endpoint,
-    String serviceName = "@dart/opentelemetry_api",
-    String? serviceVersion = '1.11.0.0',
+    String serviceName = OTelAPI.defaultServiceName,
+    String? serviceVersion = OTelAPI.defaultServiceVersion,
     bool enabled = true,
     bool isShutdown = false,
   })  : _endpoint = endpoint,
@@ -66,8 +67,7 @@ class APIMeterProvider {
     // Validate the meter name; if invalid (empty), log a warning and use empty string.
     final validatedName = name.isEmpty ? '' : name;
     if (validatedName.isEmpty) {
-      print(
-          'Warning: Invalid meter name provided; using empty string as fallback.');
+      OTelLog.warn('Invalid meter name provided; using empty string as fallback.');
     }
 
     // Create a cache key based on the provided parameters.
@@ -134,7 +134,7 @@ class APIMeterProvider {
 
       return true;
     } catch (e) {
-      print('Error during MeterProvider shutdown: $e');
+      OTelLog.error('Error during MeterProvider shutdown: $e');
       return false;
     }
   }
@@ -152,7 +152,7 @@ class APIMeterProvider {
       // In the API implementation, this is a no-op
       return true;
     } catch (e) {
-      print('Error during MeterProvider forceFlush: $e');
+      OTelLog.error('Error during MeterProvider forceFlush: $e');
       return false;
     }
   }

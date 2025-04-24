@@ -16,10 +16,11 @@ class Attributes {
   final Map<String, Attribute> _entries = {};
 
   static of(Map<String, Object> map) {
-    //Note that this directly uses the API factory, not the installed factory
-    //This is to allow the creation of attributes for initialization and is
-    //ok since Attributes is unlikely to be overridden by the SDK.
-    return OTelAPIFactory.attrsFromMap(map);
+    // Directly use the API factory's attrsFromMap if not initialized
+    // This is to allow the creation of attributes for initialization and is
+    // Overrides would take effect after initialization.
+    return OTelFactory.otelFactory != null ? OTelFactory.otelFactory!.attributesFromMap(map)
+        : OTelAPIFactory.attrsFromMap(map);
   }
 
   /// Creates an Attributes instance from a JSON map.
@@ -62,7 +63,7 @@ class Attributes {
           }
         }
       }
-      // Other types are ignored
+      OTelLog.warn('Ignorning attribute $key because the value not a valid attribute type.  Only String, bool, int, double and Lists of those types are allowed by the OTel specification.');
     }
 
     return AttributesCreate.create(attributes);

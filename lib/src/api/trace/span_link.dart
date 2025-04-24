@@ -18,10 +18,6 @@ class SpanLink {
   final Attributes attributes;
 
   /// Creates a new [SpanLink].
-  /// You cannot create a SpanLink directly; you must use [OTelFactory]:
-  /// ```dart
-  /// var link = OTelFactory.spanLink(context);
-  /// ```
    SpanLink._({
     required this.spanContext,
     required this.attributes,

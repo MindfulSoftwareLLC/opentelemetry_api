@@ -3,11 +3,7 @@
 
 import '../../../opentelemetry_api.dart';
 
-/// Represents the instrumentation scope information for a Span.
-///
-/// This follows the OpenTelemetry specification which states that each Tracer has
-/// an associated InstrumentationScope that provides information about the library
-/// that created the Span.
+/// Represents the instrumentation scope information.
 class InstrumentationScope {
   final String name;
   final String? version;

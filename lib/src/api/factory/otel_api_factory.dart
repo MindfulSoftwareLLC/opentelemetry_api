@@ -2,6 +2,7 @@
 // Copyright 2025, Michael Bushe, All rights reserved.
 
 import 'dart:typed_data';
+import 'package:opentelemetry_api/opentelemetry_api.dart' show OTelAPI, Timestamp;
 import 'package:opentelemetry_api/src/api/baggage/baggage.dart';
 import 'package:opentelemetry_api/src/factory/otel_factory.dart';
 import 'package:opentelemetry_api/src/api/trace/span_context.dart';
@@ -21,7 +22,6 @@ import 'package:opentelemetry_api/src/api/metrics/observable_counter.dart';
 import 'package:opentelemetry_api/src/api/metrics/observable_gauge.dart';
 import 'package:opentelemetry_api/src/api/metrics/observable_up_down_counter.dart';
 
-import '../../util/date_util.dart';
 import '../baggage/baggage_entry.dart';
 import '../common/attribute.dart';
 import '../common/attributes.dart';
@@ -79,8 +79,8 @@ class OTelAPIFactory extends OTelFactory {
   @override
   APITracerProvider tracerProvider(
       {required String endpoint,
-      String serviceName = "@dart/opentelemetry_api",
-      String? serviceVersion = '1.11.0.0'}) {
+      String serviceName = OTelAPI.defaultServiceName,
+      String? serviceVersion = OTelAPI.defaultServiceVersion}) {
     return TracerProviderCreate.create(
         endpoint: endpoint,
         serviceName: serviceName,
@@ -90,8 +90,8 @@ class OTelAPIFactory extends OTelFactory {
   @override
   APIMeterProvider meterProvider(
       {required String endpoint,
-      String serviceName = "@dart/opentelemetry_api",
-      String? serviceVersion = '1.11.0.0'}) {
+      String serviceName = OTelAPI.defaultServiceName,
+      String? serviceVersion = OTelAPI.defaultServiceVersion}) {
     return MeterProviderCreate.create(
         endpoint: endpoint,
         serviceName: serviceName,
@@ -110,14 +110,10 @@ class OTelAPIFactory extends OTelFactory {
 
   @override
   Attributes attributesFromMap(Map<String, Object> namedMap) {
-    /// Cheating a bit since Attribute is unlikely to be overriden
-    /// in a factory but likely to be used for initialize();
     return attrsFromMap(namedMap);
   }
 
   static Attributes attrsFromMap(Map<String, Object> namedMap) {
-    /// Cheating a bit since Attribute is unlikely to be overriden
-    /// in a factory but likely to be used for initialize();
     final attributes = <Attribute>[];
     namedMap.forEach((key, value) {
       if (value is String) {
@@ -131,7 +127,7 @@ class OTelAPIFactory extends OTelFactory {
       } else if (value is bool) {
         attributes.add(AttributeCreate.create(key, value));
       } else if (value is DateTime) {
-        String isoTimestamp = dateTimeToString(value);
+        String isoTimestamp = Timestamp.dateTimeToString(value);
         attributes
             .add(AttributeCreate.create(key, isoTimestamp));
       } else if (value is Attribute) {

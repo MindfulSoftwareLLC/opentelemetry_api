@@ -21,8 +21,8 @@ class APIMeterCreate {
 
     return APIMeter._(
       name: name,
-      version: setDefaults ? '1.42.0.0' : version, // Only set default if no parameters were provided
-      schemaUrl: setDefaults ? 'https://opentelemetry.io/schemas/1.11.0' : schemaUrl, // Only set default if no parameters were provided
+      version: setDefaults ? OTelAPI.defaultServiceVersion : version, // Only set default if no parameters were provided
+      schemaUrl: setDefaults ? OTelAPI.defaultSchemaUrl : schemaUrl, // Only set default if no parameters were provided
       attributes: attributes,
     );
   }

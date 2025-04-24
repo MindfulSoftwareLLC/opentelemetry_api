@@ -102,5 +102,51 @@ void main() {
       // Try to get providers - they should be new instances
       expect(OTelFactory.otelFactory, isNotNull);
     });
+
+
+    test('initialize throws when called twice', () {
+      // Already initialized in setUp, so calling again should throw
+      expect(() {
+        OTelAPI.initialize(
+          endpoint: 'http://localhost:4317',
+          serviceName: 'test-service',
+          serviceVersion: '1.0.0',
+        );
+      }, throwsA(isA<StateError>()));
+    });
+
+    test('initialize throws with empty endpoint', () {
+      OTelAPI.reset();
+      expect(() {
+        OTelAPI.initialize(
+          endpoint: '',
+          serviceName: 'test-service',
+          serviceVersion: '1.0.0',
+        );
+      }, throwsA(isA<ArgumentError>()));
+    });
+
+    test('initialize throws with empty serviceName', () {
+      OTelAPI.reset();
+      expect(() {
+        OTelAPI.initialize(
+          endpoint: 'http://localhost:4317',
+          serviceName: '',
+          serviceVersion: '1.0.0',
+        );
+      }, throwsA(isA<ArgumentError>()));
+    });
+
+    test('initialize throws with empty serviceVersion', () {
+      OTelAPI.reset();
+      expect(() {
+        OTelAPI.initialize(
+          endpoint: 'http://localhost:4317',
+          serviceName: 'test-service',
+          serviceVersion: '',
+        );
+      }, throwsA(isA<ArgumentError>()));
+    });
+
   });
 }

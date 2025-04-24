@@ -4,6 +4,7 @@
 
 // ignore_for_file: unnecessary_getters_setters
 
+import '../../../opentelemetry_api.dart' show OTelAPI, OTelLog;
 import '../common/attributes.dart';
 import '../context/context.dart';
 import 'tracer.dart';
@@ -33,17 +34,10 @@ class APITracerProvider {
   final Map<_TracerKey, APITracer> _tracerCache = {};
 
   /// Creates a new [APITracerProvider].
-  /// You cannot create a TracerProvider directly; you must use [OTelFactory]:
-  /// ```dart
-  /// var tracerProvider = OTelFactory.tracerProvider();
-  // Create defaults for convenience so test coverage completes
-  static const String defaultVersion = '1.42.0.0';
-  static const String defaultSchemaUrl = 'https://opentelemetry.io/schemas/1.11.0';
-
   APITracerProvider._({
     required String endpoint,
-    String serviceName = "@dart/opentelemetry_api",
-    String? serviceVersion = '1.11.0.0',
+    String serviceName = OTelAPI.defaultServiceName,
+    String? serviceVersion = OTelAPI.defaultServiceVersion,
     bool enabled = true,
     bool isShutdown = false,
   })  : _endpoint = endpoint,
@@ -74,8 +68,7 @@ class APITracerProvider {
     // Validate the tracer name; if invalid (empty), log a warning and use empty string.
     final validatedName = name.isEmpty ? '' : name;
     if (validatedName.isEmpty) {
-      print(
-          'Warning: Invalid tracer name provided; using empty string as fallback.');
+      OTelLog.warn('Invalid tracer name provided; using empty string as fallback.');
     }
 
     // Apply default values if none are provided
@@ -84,8 +77,8 @@ class APITracerProvider {
 
     // Only apply defaults if all optional parameters are missing
     if (version == null && schemaUrl == null && attributes == null) {
-      effectiveVersion = defaultVersion;
-      effectiveSchemaUrl = defaultSchemaUrl;
+      effectiveVersion = OTelAPI.defaultServiceVersion;
+      effectiveSchemaUrl = OTelAPI.defaultSchemaUrl;
     }
 
     // Create a cache key based on the provided parameters.
@@ -156,7 +149,7 @@ class APITracerProvider {
 
       return true;
     } catch (e) {
-      print('Error during TracerProvider shutdown: $e');
+      OTelLog.error('Error during TracerProvider shutdown: $e');
       return false;
     }
   }

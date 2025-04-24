@@ -29,7 +29,7 @@ void main() {
       final tracer = OTelAPI.tracer('test-tracer');
 
       expect(tracer.name, equals('test-tracer'));
-      expect(tracer.version, equals('1.42.0.0'));
+      expect(tracer.version, equals('1.11.0.0'));
       expect(tracer.schemaUrl, equals('https://opentelemetry.io/schemas/1.11.0'));
     });
 

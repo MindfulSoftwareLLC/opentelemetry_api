@@ -7,8 +7,8 @@ import 'observable_callback.dart';
 
 part 'observable_up_down_counter_create.dart';
 
-/// APIObservableUpDownCounter is an asynchronous Instrument which reports values that
-/// increase or decrease when the instrument is being observed.
+/// APIObservableUpDownCounter is an asynchronous Instrument which reports
+/// values that increase or decrease when the instrument is being observed.
 ///
 /// An ObservableUpDownCounter is intended for capturing values that can increase or
 /// decrease, such as the current memory usage, active requests, or items in a queue.

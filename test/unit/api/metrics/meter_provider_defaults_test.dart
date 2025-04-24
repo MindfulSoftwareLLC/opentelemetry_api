@@ -25,7 +25,7 @@ void main() {
 
       // Assert
       expect(meter.name, equals('test-meter'));
-      expect(meter.version, equals('1.42.0.0')); // Default version should be applied
+      expect(meter.version, equals('1.11.0.0')); // Default version should be applied
       expect(meter.schemaUrl, equals('https://opentelemetry.io/schemas/1.11.0')); // Default schema should be applied
       expect(meter.attributes, isNull);
     });
@@ -81,6 +81,19 @@ void main() {
       expect(meter.schemaUrl, isNull); // No default schema
       expect(meter.attributes, isNotNull);
       expect(meter.attributes!.getString('key'), equals('value'));
+    });
+
+
+    test('meterProvider returns existing named provider', () {
+      final name = 'test-meter-provider';
+
+      // Create a named provider
+      final provider1 = OTelAPI.addMeterProvider(name);
+
+      // Get the same provider by name
+      final provider2 = OTelAPI.meterProvider(name);
+
+      expect(provider2, same(provider1));
     });
   });
 }

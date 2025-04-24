@@ -5,7 +5,6 @@
 part of 'meter_provider.dart';
 
 /// Factory methods for creating [APIMeterProvider] instances.
-/// This is part of the meter_provider.dart file to keep related code together.
 class MeterProviderCreate {
   /// Creates a new [APIMeterProvider] instance.
   /// This is an implementation detail and should not be used directly.

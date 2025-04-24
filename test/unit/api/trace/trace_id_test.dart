@@ -1,6 +1,8 @@
 // Licensed under the Apache License, Version 2.0
 // Copyright 2025, Michael Bushe, All rights reserved.
 
+import 'dart:typed_data';
+
 import 'package:opentelemetry_api/src/api/otel_api.dart';
 import 'package:test/test.dart';
 
@@ -65,5 +67,32 @@ void main() {
       expect(uniqueIds.length, equals(ids.length),
           reason: 'All generated trace IDs should be unique');
     });
+
+    test('traceId and spanId from bytes validation', () {
+      // Invalid length for trace ID
+      final invalidTraceIdBytes = Uint8List.fromList(List.filled(8, 0));
+      expect(() {
+        OTelAPI.traceIdOf(invalidTraceIdBytes);
+      }, throwsArgumentError);
+
+      // Invalid length for span ID
+      final invalidSpanIdBytes = Uint8List.fromList(List.filled(16, 0));
+      expect(() {
+        OTelAPI.spanIdOf(invalidSpanIdBytes);
+      }, throwsArgumentError);
+    });
+
+    test('traceIdFrom handles invalid hex strings', () {
+      expect(() {
+        OTelAPI.traceIdFrom('invalid-hex');
+      }, throwsFormatException);
+    });
+
+    test('spanIdFrom handles invalid hex strings', () {
+      expect(() {
+        OTelAPI.spanIdFrom('invalid-hex');
+      }, throwsFormatException);
+    });
+
   });
 }
