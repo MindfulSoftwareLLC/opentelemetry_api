@@ -1,7 +1,3 @@
-## 1.0.1
+## 0.8.0
 
-- Removed intl dependency formated data in plain Dart.
-
-## 1.0.0
-
-- Initial version.
+- Initial public version.

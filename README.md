@@ -12,9 +12,10 @@ and the Flutter guide for
 -->
 
 # opentelemetry_api
-An OpenTelemetry (OTel) API for Dart. This API is rarely used without an SDK.
-The SDK for this API is implemented by `dartastic_opentelemetry`, the
-[Dartastic OTel SDK](https://pub.dev/packages/dartastic_opentelemetry).
+An OpenTelemetry (OTel) API for Dart. 
+
+This API is rarely used without an SDK. The SDK for this API is implemented by 
+`dartastic_opentelemetry`, the [Dartastic OTel SDK](https://pub.dev/packages/dartastic_opentelemetry).
 To instrument Dart apps, include the latest `dartastic_opentelemetry` and use its `OTel` class.
 
 To instrument Flutter applications use the [Flutterific OTel SDK](https://pub.dev/packages/flutterrific_opentelemetry), 
@@ -22,7 +23,7 @@ To instrument Flutter applications use the [Flutterific OTel SDK](https://pub.de
 and web vitals metrics and much more.  Additional Flutterific OTel SDKs hook into popular Flutter libraries for state management, 
 networking, logging, amongst others.  
 
-Use [Dartastic.io](https://dartastic.io) as your OpenTelemetry Observability backend for Flutter apps, Dart backends and 
+[Dartastic.io](https://dartastic.io) provides and OpenTelemetry Observability backend for Flutter apps, Dart backends and 
 any other service or process that produces OpenTelemetry. Dartastic.io is an observability background built on 
 open standards, catering specifically to Flutter and Dart applications with the ability to show Dart source code lines
 and function calls from production errors and logs.
