@@ -353,7 +353,7 @@ class OTelAPI {
   static TraceId traceIdFrom(String hexString) {
     _getAndCacheOtelFactory();
     try {
-      var bytes = IdGenerator.hexToBytes(hexString);
+      final bytes = IdGenerator.hexToBytes(hexString);
       if (bytes == null || bytes.length != TraceId.traceIdLength) {
         throw FormatException('TraceId must be {$TraceId.traceIdLength} bytes');
       }
@@ -389,9 +389,9 @@ class OTelAPI {
 
     /// Generate a new random SpanId
     try {
-      var bytes = IdGenerator.hexToBytes(hexString);
+      final bytes = IdGenerator.hexToBytes(hexString);
       if (bytes == null || bytes.length != SpanId.spanIdLength) {
-        throw FormatException('SpanId must be ${SpanId.spanIdLength} bytes');
+        throw const FormatException('SpanId must be ${SpanId.spanIdLength} bytes');
       }
       return OTelFactory.otelFactory!.spanId(bytes);
     } catch (e) {

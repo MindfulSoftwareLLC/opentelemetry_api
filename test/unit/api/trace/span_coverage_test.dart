@@ -63,7 +63,7 @@ void main() {
     test('span addEvent with attributes and timestamp', () {
       final span = tracer!.createSpan(name: 'test-span');
       final attributes = Attributes.of({'event.key': 'value'});
-      final timestamp = DateTime.now().subtract(Duration(minutes: 5));
+      final timestamp = DateTime.now().subtract(const Duration(minutes: 5));
 
       span.addEvent(OTelAPI.spanEvent('test-event', attributes, timestamp));
 
@@ -106,7 +106,7 @@ void main() {
     });
 
     test('span end with endTime parameter', () {
-      final startTime = DateTime.now().subtract(Duration(minutes: 1));
+      final startTime = DateTime.now().subtract(const Duration(minutes: 1));
       final endTime = DateTime.now();
 
       final span = tracer!.createSpan(

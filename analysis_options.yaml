@@ -31,7 +31,6 @@ linter:
     - comment_references
     - directives_ordering
     - noop_primitive_operations
-    - package_api_docs
     - prefer_const_constructors
     - prefer_final_fields
     - prefer_final_locals

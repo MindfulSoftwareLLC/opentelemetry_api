@@ -1,9 +1,10 @@
 // Licensed under the Apache License, Version 2.0
 // Copyright 2025, Michael Bushe, All rights reserved.
 
+import 'dart:async';
+
 import 'package:opentelemetry_api/opentelemetry_api.dart';
 import 'package:test/test.dart';
-import 'dart:async';
 
 void main() {
   group('APITracer - Additional Coverage Tests', () {
@@ -48,7 +49,7 @@ void main() {
         await tracer.recordSpanAsync(
           name: 'error-span',
           fn: () async {
-            await Future.delayed(Duration(milliseconds: 10));
+            await Future.delayed(const Duration(milliseconds: 10));
             throw Exception('Test error');
           },
         );

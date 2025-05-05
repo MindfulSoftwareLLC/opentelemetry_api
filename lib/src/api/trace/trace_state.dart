@@ -60,7 +60,7 @@ class TraceState {
   String? get(String key) => _entries[key];
 
   /// Returns true if there are no entries.
-  get isEmpty => _entries.isEmpty;
+  bool get isEmpty => _entries.isEmpty;
 
   /// Returns an immutable map of the key-value pairs in this trace state.
   Map<String, String> asMap() => Map.unmodifiable(_entries);

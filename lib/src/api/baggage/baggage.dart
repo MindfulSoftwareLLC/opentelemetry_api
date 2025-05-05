@@ -3,8 +3,8 @@
 
 library baggage;
 
-import 'package:opentelemetry_api/opentelemetry_api.dart';
 import 'package:meta/meta.dart';
+import 'package:opentelemetry_api/opentelemetry_api.dart';
 
 part 'baggage_create.dart';
 

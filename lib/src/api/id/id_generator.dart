@@ -11,7 +11,7 @@ class IdGenerator {
   /// Generate a 16-byte trace ID.
   /// Returns bytes which can be formatted as a 32-char hex string.
   static Uint8List generateTraceId() {
-    var bytes = Uint8List(16);
+    final Uint8List bytes = Uint8List(16);
     
     // Generate random bytes until we get a non-zero ID
     do {
@@ -26,7 +26,7 @@ class IdGenerator {
   /// Generate an 8-byte span ID.
   /// Returns bytes which can be formatted as a 16-char hex string.
   static Uint8List generateSpanId() {
-    var bytes = Uint8List(8);
+    final bytes = Uint8List(8);
     
     // Generate random bytes until we get a non-zero ID
     do {
@@ -55,11 +55,11 @@ class IdGenerator {
   static Uint8List? hexToBytes(String hex) {
     if (hex.length % 2 != 0) return null;
     
-    var bytes = Uint8List(hex.length ~/ 2);
+    final bytes = Uint8List(hex.length ~/ 2);
     
     for (var i = 0; i < bytes.length; i++) {
-      var hexByte = hex.substring(i * 2, (i * 2) + 2);
-      var byte = int.tryParse(hexByte, radix: 16);
+      final hexByte = hex.substring(i * 2, (i * 2) + 2);
+      final byte = int.tryParse(hexByte, radix: 16);
       if (byte == null) return null;
       bytes[i] = byte;
     }

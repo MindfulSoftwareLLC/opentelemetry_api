@@ -3,18 +3,18 @@
 
 import 'dart:typed_data';
 
+import 'package:opentelemetry_api/src/api/metrics/counter.dart';
+import 'package:opentelemetry_api/src/api/metrics/gauge.dart';
+import 'package:opentelemetry_api/src/api/metrics/histogram.dart';
 import 'package:opentelemetry_api/src/api/metrics/measurement.dart';
+import 'package:opentelemetry_api/src/api/metrics/meter_provider.dart';
+import 'package:opentelemetry_api/src/api/metrics/up_down_counter.dart';
 import 'package:opentelemetry_api/src/api/trace/span_event.dart';
 import 'package:opentelemetry_api/src/api/trace/span_id.dart';
 import 'package:opentelemetry_api/src/api/trace/trace_flags.dart';
 import 'package:opentelemetry_api/src/api/trace/trace_id.dart';
 import 'package:opentelemetry_api/src/api/trace/trace_state.dart';
 import 'package:opentelemetry_api/src/api/trace/tracer_provider.dart';
-import 'package:opentelemetry_api/src/api/metrics/meter_provider.dart';
-import 'package:opentelemetry_api/src/api/metrics/counter.dart';
-import 'package:opentelemetry_api/src/api/metrics/gauge.dart';
-import 'package:opentelemetry_api/src/api/metrics/histogram.dart';
-import 'package:opentelemetry_api/src/api/metrics/up_down_counter.dart';
 
 import '../../opentelemetry_api.dart' show OTelAPI;
 import '../api/baggage/baggage.dart';
@@ -93,7 +93,7 @@ abstract class OTelFactory {
   static OTelFactory deserialize(
       Map<String, dynamic> data, OTelFactoryCreationFunction factoryFactory) {
     // For example, returning an instance of OTelAPIFactory.
-    var oTelFactory = factoryFactory(
+    final oTelFactory = factoryFactory(
       apiEndpoint: data['apiEndpoint'] as String,
       apiServiceName: data['apiServiceName'] as String,
       apiServiceVersion: data['apiServiceVersion'] as String,

@@ -3,8 +3,8 @@
 
 library attribute_value;
 
-import 'package:meta/meta.dart';
 import 'package:collection/collection.dart';
+import 'package:meta/meta.dart';
 
 part 'attribute_create.dart';
 
@@ -12,7 +12,7 @@ part 'attribute_create.dart';
 @immutable
 class Attribute<T extends Object> {
   // For deep equality checks (e.g., for lists)
-  static final DeepCollectionEquality _listEquality = DeepCollectionEquality();
+  static final DeepCollectionEquality _listEquality = const DeepCollectionEquality();
 
   final String _key;
   final T _value;
@@ -24,7 +24,7 @@ class Attribute<T extends Object> {
       throw ArgumentError('Attribute _value must not be an empty string');
     }
     if (_value is List) {
-      var valueList = (_value as List);
+      final valueList = (_value as List);
       if (valueList.isEmpty) {
         throw ArgumentError('Attribute _value list must not be empty');
       }

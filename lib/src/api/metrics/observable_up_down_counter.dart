@@ -1,8 +1,8 @@
 // Licensed under the Apache License, Version 2.0
 // Copyright 2025, Michael Bushe, All rights reserved.
 
-import 'meter.dart';
 import 'measurement.dart';
+import 'meter.dart';
 import 'observable_callback.dart';
 
 part 'observable_up_down_counter_create.dart';

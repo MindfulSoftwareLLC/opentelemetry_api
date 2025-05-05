@@ -94,7 +94,7 @@ void main() {
         'key': OTelAPI.baggageEntry('value', null),
       });
 
-      var context = Context.current
+      final context = Context.current
           .withSpan(span)
           .withBaggage(baggage);
 
@@ -229,7 +229,7 @@ void main() {
         'key': OTelAPI.baggageEntry('value', null),
       });
 
-      var context = Context.current
+      final context = Context.current
           .withSpan(span)
           .withBaggage(baggage);
 

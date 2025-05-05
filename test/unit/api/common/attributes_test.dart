@@ -19,8 +19,8 @@ void main() {
     });
 
     test('should store and retrieve string attributes', () {
-      var name = 'test.key';
-      var value = 'test-value';
+      final name = 'test.key';
+      final value = 'test-value';
       attributes = attributes.copyWithStringAttribute(name, value);
 
       expect(attributes.getString(name), equals(value));
@@ -28,8 +28,8 @@ void main() {
     });
 
     test('should store and retrieve bool attributes', () {
-      var value = true;
-      var name = 'test.bool.key';
+      final value = true;
+      final name = 'test.bool.key';
       attributes = attributes.copyWithBoolAttribute(name, value);
 
       expect(attributes.getBool(name), equals(value));
@@ -37,8 +37,8 @@ void main() {
     });
 
     test('should store and retrieve int attributes', () {
-      var name = 'test.int.key';
-      var value = 42;
+      final name = 'test.int.key';
+      final value = 42;
       attributes = attributes.copyWithIntAttribute(name, value);
 
       expect(attributes.getInt(name), equals(value));
@@ -46,8 +46,8 @@ void main() {
     });
 
     test('should store and retrieve double attributes', () {
-      var value = 42.1;
-      var name = 'test-int-key';
+      final value = 42.1;
+      final name = 'test-int-key';
       attributes = attributes.copyWithDoubleAttribute(name, value);
 
       expect(attributes.getDouble(name), equals(value));
@@ -56,8 +56,8 @@ void main() {
 
 
     test('should store and retrieve string list attributes', () {
-      var name = 'test.key';
-      var value = ['test-value', 'foo', 'bar'];
+      final name = 'test.key';
+      final value = ['test-value', 'foo', 'bar'];
       attributes = attributes.copyWithStringListAttribute(name, value);
 
       expect(attributes.getStringList(name), equals(value));
@@ -65,8 +65,8 @@ void main() {
     });
 
     test('should store and retrieve bool list attributes', () {
-      var name = 'test.bool.key';
-      var value = [true, false, true];
+      final name = 'test.bool.key';
+      final value = [true, false, true];
       attributes = attributes.copyWithBoolListAttribute(name, value);
 
       expect(attributes.getBoolList(name), equals(value));
@@ -74,8 +74,8 @@ void main() {
     });
 
     test('should store and retrieve int list attributes', () {
-      var name = 'test.int.key';
-      var value = [42, 0, -1];
+      final name = 'test.int.key';
+      final value = [42, 0, -1];
       attributes = attributes.copyWithIntListAttribute(name, value);
 
       expect(attributes.getIntList(name), equals(value));
@@ -83,8 +83,8 @@ void main() {
     });
 
     test('should store and retrieve double list attributes', () {
-      var value = [42.1, 43.2, 0.1];
-      var name = 'test-int-key';
+      final value = [42.1, 43.2, 0.1];
+      final name = 'test-int-key';
       attributes = attributes.copyWithDoubleListAttribute(name, value);
 
       expect(attributes.getDoubleList(name), equals(value));
@@ -92,8 +92,8 @@ void main() {
     });
 
     test('should store and retrieve string list attributes', () {
-      var name = 'test.key';
-      var value = ['test-value', 'foo', 'bar'];
+      final name = 'test.key';
+      final value = ['test-value', 'foo', 'bar'];
       attributes = attributes.copyWithStringListAttribute(name, value);
 
       expect(attributes.getStringList(name), equals(value));
@@ -132,7 +132,7 @@ void main() {
       final doubleListAttribute = OTelAPI.attributeDoubleList('double.list', [0.0, 1.1, 22.22]);
       final boolListAttribute = OTelAPI.attributeBoolList('bool.list', [true, false, true]);
 
-      List<Attribute> attributeList = [stringAttribute, intAttribute,boolAttribute,doubleAttribute, stringListAttribute, intListAttribute, boolListAttribute, doubleListAttribute];
+      final List<Attribute> attributeList = [stringAttribute, intAttribute,boolAttribute,doubleAttribute, stringListAttribute, intListAttribute, boolListAttribute, doubleListAttribute];
       attributes = attributes.copyWithAttributes( OTelAPI.attributesFromList(attributeList));
 
       expect(attributes.getString(stringAttribute.key), equals(stringAttribute.value));

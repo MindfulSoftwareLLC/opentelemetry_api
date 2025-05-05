@@ -9,8 +9,9 @@ import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
-import '../baggage/baggage.dart';
+
 import '../../factory/otel_factory.dart';
+import '../baggage/baggage.dart';
 import '../trace/span.dart';
 import '../trace/span_context.dart';
 import 'context_key.dart';
@@ -84,11 +85,11 @@ class Context {
   /// ```dart
   /// var context = OTelFactory.context(values);
   /// ```
-  const Context._(Map<ContextKey, Object?>? contextValues)
+  const Context._(Map<ContextKey<Object?>, Object?>? contextValues)
       : _values = contextValues ?? const {};
 
   /// The values stored in this context
-  final Map<ContextKey, Object?> _values;
+  final Map<ContextKey<Object?>, Object?> _values;
 
   /// Gets the currently active span in this context, if any
   APISpan? get span => _values[_spanKey] as APISpan?;
@@ -100,7 +101,7 @@ class Context {
 
   /// Gets the baggage from the context.
   Baggage? get baggage {
-    var baggage = get<Baggage>(_baggageKey);
+    final baggage = get<Baggage>(_baggageKey);
     return baggage;
   }
 
@@ -117,7 +118,7 @@ class Context {
 
   /// Creates a new Context without a span or span context
   Context copyWithoutSpan() {
-    final newValues = Map<ContextKey, Object?>.from(_values);
+    final newValues = Map<ContextKey<Object?>, Object?>.from(_values);
     newValues.remove(_spanKey);
     newValues.remove(_spanContextKey);
     return ContextCreate.create(contextMap: newValues);
@@ -224,8 +225,8 @@ class Context {
   /// Creates a new Context adding in [moreBaggage], replacing any existing
   /// keys that are the same as the keys in [moreBaggage]
   Context copyWithBaggage(Baggage moreBaggage) {
-    var currentBaggage = baggage;
-    Baggage newBaggage = currentBaggage == null
+    final currentBaggage = baggage;
+    final Baggage newBaggage = currentBaggage == null
         ? moreBaggage
         : currentBaggage.copyWithBaggage(moreBaggage);
     return ContextCreate.create(contextMap: {
@@ -234,10 +235,8 @@ class Context {
     });
   }
 
-  /// Creates a new Context adding in [moreBaggage], replacing any existing
-  /// keys that are the same as the keys in [moreBaggage]
   Context copyWithSpanContext(SpanContext spanContext) {
-    var newContext = ContextCreate.create(contextMap: {
+    final newContext = ContextCreate.create(contextMap: {
       ..._values,
       _spanContextKey: spanContext,
     });
@@ -292,7 +291,7 @@ class Context {
     final keyNamesCount = <String, int>{};
 
     // Only serialize baggage if it has entries
-    var currentBaggage = baggage;
+    final currentBaggage = baggage;
     if (currentBaggage != null && currentBaggage.getAllEntries().isNotEmpty) {
       values['baggage'] = currentBaggage.toJson();
     }
@@ -370,7 +369,7 @@ class Context {
           // Note: Two keys with same name but different uniqueIds are valid and distinct
 
           // Recreate the context key with the same name and uniqueId
-          final contextKey = OTelFactory.otelFactory!.contextKey(
+          final contextKey = OTelFactory.otelFactory!.contextKey<Object?>(
             keyName,
             uniqueIdList,
           );

@@ -4,13 +4,13 @@
 import '../../../opentelemetry_api.dart' show OTelAPI;
 import '../common/attributes.dart';
 import 'counter.dart';
-import 'observable_callback.dart';
-import 'up_down_counter.dart';
-import 'histogram.dart';
 import 'gauge.dart';
+import 'histogram.dart';
+import 'observable_callback.dart';
 import 'observable_counter.dart';
-import 'observable_up_down_counter.dart';
 import 'observable_gauge.dart';
+import 'observable_up_down_counter.dart';
+import 'up_down_counter.dart';
 
 part 'meter_create.dart';
 

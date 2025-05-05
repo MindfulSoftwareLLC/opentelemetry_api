@@ -4,9 +4,10 @@
 import 'package:opentelemetry_api/src/api/trace/span_context.dart';
 import 'package:opentelemetry_api/src/api/trace/span_event.dart';
 import 'package:opentelemetry_api/src/factory/otel_factory.dart';
+
 import '../common/attributes.dart';
-import '../context/context.dart';
 import '../common/instrumentation_scope.dart';
+import '../context/context.dart';
 import 'span.dart';
 import 'span_kind.dart';
 import 'span_link.dart';
@@ -97,7 +98,7 @@ class APITracer {
     List<SpanLink>? links,
     bool? isRecording = true,
   }) {
-    var span = createSpan(
+    final span = createSpan(
         name: name,
         spanContext: spanContext,
         parentSpan: parentSpan,
@@ -282,7 +283,7 @@ class APITracer {
       }
     }
 
-    var apiSpan = APISpanCreate.create(
+    final apiSpan = APISpanCreate.create(
       name: name,
       instrumentationScope: InstrumentationScope(
         name: this.name,

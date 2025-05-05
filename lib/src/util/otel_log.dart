@@ -83,7 +83,7 @@ class OTelLog {
   static void logMetric(String message) {
     if (isLogMetrics()) {
       final timestamp = DateTime.now().toIso8601String();
-      String msg = message;
+      final String msg = message;
       metricLogFunction!('[$timestamp] [metric] $msg ');
     }
   }
@@ -92,7 +92,7 @@ class OTelLog {
   static void logExport(String message) {
     if (isLogExport()) {
       final timestamp = DateTime.now().toIso8601String();
-      String msg = message;
+      final String msg = message;
       exportLogFunction!('[$timestamp] [export] $msg ');
     }
   }

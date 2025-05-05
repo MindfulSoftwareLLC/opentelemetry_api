@@ -3,8 +3,9 @@
 
 import 'package:meta/meta.dart';
 import 'package:opentelemetry_api/src/api/trace/span_context.dart';
-import '../common/attributes.dart';
+
 import '../../factory/otel_factory.dart';
+import '../common/attributes.dart';
 
 part 'span_link_create.dart';
 

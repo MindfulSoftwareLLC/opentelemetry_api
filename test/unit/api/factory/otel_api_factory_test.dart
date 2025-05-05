@@ -1,6 +1,8 @@
 // Licensed under the Apache License, Version 2.0
 // Copyright 2025, Michael Bushe, All rights reserved.
 
+// ignore_for_file: always_declare_return_types
+
 import 'dart:typed_data';
 import 'package:opentelemetry_api/opentelemetry_api.dart';
 import 'package:test/test.dart';

@@ -66,6 +66,7 @@ void main() {
 
     test('serialize skips non-serializable values', () {
       // Create a context with a non-serializable value (a function)
+      // ignore: always_declare_return_types
       nonSerializableValue() => 'function';
 
       // Try to serialize with the function

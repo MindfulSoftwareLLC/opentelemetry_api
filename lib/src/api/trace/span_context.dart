@@ -59,7 +59,7 @@ class SpanContext {
   }
 
   Map<String, dynamic> toJson() {
-    var jsonMap = {
+    final jsonMap = {
       'traceId': traceId.toString(),
       'spanId': spanId.toString(),
       'traceFlags': traceFlags.asByte,

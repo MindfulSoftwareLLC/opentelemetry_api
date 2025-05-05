@@ -2,9 +2,17 @@
 // Copyright 2025, Michael Bushe, All rights reserved.
 
 import 'dart:typed_data';
+
 import 'package:opentelemetry_api/opentelemetry_api.dart' show OTelAPI, Timestamp;
 import 'package:opentelemetry_api/src/api/baggage/baggage.dart';
-import 'package:opentelemetry_api/src/factory/otel_factory.dart';
+import 'package:opentelemetry_api/src/api/metrics/counter.dart';
+import 'package:opentelemetry_api/src/api/metrics/gauge.dart';
+import 'package:opentelemetry_api/src/api/metrics/histogram.dart';
+import 'package:opentelemetry_api/src/api/metrics/meter_provider.dart';
+import 'package:opentelemetry_api/src/api/metrics/observable_counter.dart';
+import 'package:opentelemetry_api/src/api/metrics/observable_gauge.dart';
+import 'package:opentelemetry_api/src/api/metrics/observable_up_down_counter.dart';
+import 'package:opentelemetry_api/src/api/metrics/up_down_counter.dart';
 import 'package:opentelemetry_api/src/api/trace/span_context.dart';
 import 'package:opentelemetry_api/src/api/trace/span_event.dart';
 import 'package:opentelemetry_api/src/api/trace/span_id.dart';
@@ -13,14 +21,7 @@ import 'package:opentelemetry_api/src/api/trace/trace_flags.dart';
 import 'package:opentelemetry_api/src/api/trace/trace_id.dart';
 import 'package:opentelemetry_api/src/api/trace/trace_state.dart';
 import 'package:opentelemetry_api/src/api/trace/tracer_provider.dart';
-import 'package:opentelemetry_api/src/api/metrics/meter_provider.dart';
-import 'package:opentelemetry_api/src/api/metrics/counter.dart';
-import 'package:opentelemetry_api/src/api/metrics/gauge.dart';
-import 'package:opentelemetry_api/src/api/metrics/histogram.dart';
-import 'package:opentelemetry_api/src/api/metrics/up_down_counter.dart';
-import 'package:opentelemetry_api/src/api/metrics/observable_counter.dart';
-import 'package:opentelemetry_api/src/api/metrics/observable_gauge.dart';
-import 'package:opentelemetry_api/src/api/metrics/observable_up_down_counter.dart';
+import 'package:opentelemetry_api/src/factory/otel_factory.dart';
 
 import '../baggage/baggage_entry.dart';
 import '../common/attribute.dart';
@@ -127,7 +128,7 @@ class OTelAPIFactory extends OTelFactory {
       } else if (value is bool) {
         attributes.add(AttributeCreate.create(key, value));
       } else if (value is DateTime) {
-        String isoTimestamp = Timestamp.dateTimeToString(value);
+        final String isoTimestamp = Timestamp.dateTimeToString(value);
         attributes
             .add(AttributeCreate.create(key, isoTimestamp));
       } else if (value is Attribute) {
@@ -379,7 +380,7 @@ class OTelAPIFactory extends OTelFactory {
 
   @override
   Baggage baggageForMap(Map<String, String> keyValuePairs) {
-    Map<String, BaggageEntry> entries = {};
+    final Map<String, BaggageEntry> entries = {};
     for (String key in keyValuePairs.keys) {
       entries[key] = baggageEntry(keyValuePairs[key]!);
     }

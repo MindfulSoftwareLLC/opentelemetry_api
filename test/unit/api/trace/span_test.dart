@@ -154,7 +154,7 @@ void main() {
       expect(span.isRecording, isTrue);
 
       // End with a specific timestamp
-      final endTime = startTime.add(Duration(milliseconds: 500));
+      final endTime = startTime.add(const Duration(milliseconds: 500));
       span.end(endTime: endTime);
 
       expect(span.isRecording, isFalse);
@@ -186,11 +186,11 @@ void main() {
         kind: SpanKind.internal,
       );
 
-      DateTime beforeCreation = DateTime.now();
+      final DateTime beforeCreation = DateTime.now();
       span.addEventNow('test-event',
         {'event.key': 'value'}.toAttributes(),
       );
-      DateTime afterCreation = DateTime.now();
+      final DateTime afterCreation = DateTime.now();
 
       final events = span.spanEvents;
       expect(events, hasLength(1));
@@ -204,7 +204,7 @@ void main() {
 
     test('addEvent with timestamp', () {
       final span = tracer.startSpan('test-span');
-      final timestamp = DateTime.now().subtract(Duration(minutes: 5));
+      final timestamp = DateTime.now().subtract(const Duration(minutes: 5));
 
       span.addEvent(OTelAPI.spanEvent(
         'test-event',

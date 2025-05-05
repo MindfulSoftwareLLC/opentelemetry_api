@@ -65,7 +65,7 @@ void main() {
       for (var i = 0; i < 3; i++) {
         futures.add(
           context.run(() async {
-            await Future.delayed(Duration(milliseconds: 10));
+            await Future.delayed(const Duration(milliseconds: 10));
             throw Exception('Error $i');
           }),
         );
@@ -111,9 +111,9 @@ void main() {
 
       try {
         await Context.current.run(() async {
-          await Future.delayed(Duration(milliseconds: 100));
+          await Future.delayed(const Duration(milliseconds: 100));
           return null;
-        }).timeout(Duration(milliseconds: 50));
+        }).timeout(const Duration(milliseconds: 50));
         fail('Expected timeout exception');
       } catch (e) {
         expect(e, isA<TimeoutException>());

@@ -28,7 +28,7 @@ class APIInstrument {
         _meter = meter;
 
   /// The name of the instrument, e.g., 'http.server.request_duration'.
-  /// This must be unique within a [Meter].
+  /// This must be unique within a Meter.
   String get name => _name;
 
   /// The unit of measurement, e.g., 'ms' for milliseconds.

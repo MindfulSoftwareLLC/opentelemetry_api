@@ -18,7 +18,7 @@ void main() {
     test('callback is properly typed and can be called', () {
       // Arrange
       bool callbackInvoked = false;
-      callback(APIObservableResult<int> result) {
+      void callback(APIObservableResult<int> result) {
         callbackInvoked = true;
         result.observe(42);
       }
@@ -35,7 +35,7 @@ void main() {
 
     test('callback with generic double type works correctly', () {
       // Arrange
-      callback(APIObservableResult<double> result) {
+      void callback(APIObservableResult<double> result) {
         result.observe(42.5);
       }
       final result = TestObservableResult<double>();
@@ -51,7 +51,7 @@ void main() {
     test('callback can be passed as parameter to instruments', () {
       // Arrange
       // Use num as the generic type to be compatible with instrument callbacks
-      callback(APIObservableResult<num> result) {
+      void callback(APIObservableResult<num> result) {
         result.observe(42);
       }
 
@@ -82,7 +82,7 @@ void main() {
     test('callback registration returns an APICallbackRegistration', () {
       // Arrange
       // Use num as the generic type
-      callback(APIObservableResult<num> result) {
+      void callback(APIObservableResult<num> result) {
         result.observe(42);
       }
 

@@ -1,8 +1,8 @@
 // Licensed under the Apache License, Version 2.0
 // Copyright 2025, Michael Bushe, All rights reserved.
 
-import 'package:test/test.dart';
 import 'package:opentelemetry_api/src/api/id/id_generator.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('IdGenerator', () {

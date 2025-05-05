@@ -3,8 +3,10 @@
 
 library trace_id;
 
-import 'package:meta/meta.dart';
 import 'dart:typed_data';
+
+import 'package:meta/meta.dart';
+
 import '../id/id_generator.dart';
 
 part 'trace_id_create.dart';
