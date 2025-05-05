@@ -3,7 +3,7 @@
 
 part of attribute_value;
 
-class AttributeCreate<T> {
+class AttributeCreate<T extends Object> {
   static Attribute<T> create<T>(String name, T value) {
     return Attribute._(name, value);
   }

@@ -140,7 +140,7 @@ class OTelAPI {
   }
 
   /// Get the default or named tracer from the global TracerProvider
-  static tracer(String name) {
+  static APITracer tracer(String name) {
     return OTelFactory.otelFactory!.globalDefaultTracerProvider().getTracer(name);
   }
 

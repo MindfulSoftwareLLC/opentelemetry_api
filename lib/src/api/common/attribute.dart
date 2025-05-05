@@ -10,7 +10,7 @@ part 'attribute_create.dart';
 
 /// Represents a value for an attribute, associated with an attribute key.
 @immutable
-class Attribute<T> {
+class Attribute<T extends Object> {
   // For deep equality checks (e.g., for lists)
   static final DeepCollectionEquality _listEquality = DeepCollectionEquality();
 
@@ -20,9 +20,6 @@ class Attribute<T> {
   Attribute._(String key, T value)
       : _key = key,
         _value = value {
-    if (_value == null) {
-      throw ArgumentError('Attribute _value must not be null');
-    }
     if (_value is String && (_value as String).isEmpty) {
       throw ArgumentError('Attribute _value must not be an empty string');
     }

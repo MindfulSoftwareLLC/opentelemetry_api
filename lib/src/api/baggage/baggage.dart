@@ -129,7 +129,7 @@ class Baggage {
     });
   }
 
-  get isEmpty => _entries.isEmpty;
+  bool get isEmpty => _entries.isEmpty;
 
   bool _mapEquals(Map<String, BaggageEntry> a, Map<String, BaggageEntry> b) {
     if (a.length != b.length) return false;

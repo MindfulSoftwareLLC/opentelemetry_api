@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 void main() {
   group('APISpan - Additional Coverage Tests', () {
     late OTelFactory originalFactory;
-    late APITracer tracer;
+    late APITracer? tracer;
 
     setUp(() {
       OTelAPI.reset();
@@ -28,7 +28,7 @@ void main() {
     });
 
     test('span toString outputs all properties', () {
-      final span = tracer.createSpan(
+      final span = tracer!.createSpan(
         name: 'test-span',
         kind: SpanKind.client,
         attributes: Attributes.of({'key': 'value'}),
@@ -44,7 +44,7 @@ void main() {
     });
 
     test('span copyWithAttributes updates attributes correctly', () {
-      final span = tracer.createSpan(
+      final span = tracer!.createSpan(
         name: 'test-span',
         attributes: Attributes.of({'key1': 'value1'}),
       );
@@ -61,7 +61,7 @@ void main() {
     });
 
     test('span addEvent with attributes and timestamp', () {
-      final span = tracer.createSpan(name: 'test-span');
+      final span = tracer!.createSpan(name: 'test-span');
       final attributes = Attributes.of({'event.key': 'value'});
       final timestamp = DateTime.now().subtract(Duration(minutes: 5));
 
@@ -83,18 +83,18 @@ void main() {
         spanId: spanId,
       );
 
-      final span1 = tracer.createSpan(
+      final span1 = tracer!.createSpan(
         name: 'test-span',
         spanContext: context,
       );
 
-      final span2 = tracer.createSpan(
+      final span2 = tracer!.createSpan(
         name: 'test-span',
         spanContext: context,
       );
 
       // Different span with different context
-      final span3 = tracer.createSpan(name: 'other-span');
+      final span3 = tracer!.createSpan(name: 'other-span');
 
       // Spans with same context should be equal
       expect(span1, equals(span2));
@@ -109,7 +109,7 @@ void main() {
       final startTime = DateTime.now().subtract(Duration(minutes: 1));
       final endTime = DateTime.now();
 
-      final span = tracer.createSpan(
+      final span = tracer!.createSpan(
         name: 'test-span',
         startTime: startTime,
       );
@@ -122,7 +122,7 @@ void main() {
     });
 
     test('span removeAttribute removes attribute correctly', () {
-      final span = tracer.createSpan(
+      final span = tracer!.createSpan(
         name: 'test-span',
         attributes: Attributes.of({
           'key1': 'value1',
@@ -143,7 +143,7 @@ void main() {
     });
 
     test('span recordException with all options', () {
-      final span = tracer.createSpan(name: 'test-span');
+      final span = tracer!.createSpan(name: 'test-span');
       final exception = Exception('Test error');
       final attributes = Attributes.of({'custom': 'attribute'});
 

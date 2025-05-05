@@ -3,7 +3,8 @@
 
 part of attributes;
 
-class AttributesCreate {
+/// Used internally, not exported to respect factories
+class AttributesCreate<T extends Object> {
   static Attributes create<T>(List<Attribute> entries) {
     return Attributes._(entries);
   }

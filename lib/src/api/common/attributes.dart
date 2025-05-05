@@ -13,9 +13,9 @@ part 'attributes_create.dart';
 /// Create with the OTelFactory methods.
 @immutable
 class Attributes {
-  final Map<String, Attribute> _entries = {};
+  final Map<String, Attribute<Object>> _entries = {};
 
-  static of(Map<String, Object> map) {
+  static Attributes of(Map<String, Object> map) {
     // Directly use the API factory's attrsFromMap if not initialized
     // This is to allow the creation of attributes for initialization and is
     // Overrides would take effect after initialization.
@@ -26,7 +26,7 @@ class Attributes {
   /// Creates an Attributes instance from a JSON map.
   /// This is a utility method for deserialization from logs or exports.
   static Attributes fromJson(Map<String, dynamic> json) {
-    final attributes = <Attribute>[];
+    final attributes = <Attribute<Object>>[];
 
     for (final entry in json.entries) {
       final key = entry.key;
