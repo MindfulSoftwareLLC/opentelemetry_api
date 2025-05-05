@@ -28,6 +28,10 @@ class APITracer {
   /// Gets the schema URL of the tracer
   final String? schemaUrl;
 
+  /// Optional attributes associated with this tracer.
+  ///
+  /// These attributes provide additional metadata about the instrumentation and
+  /// can be used for filtering or grouping telemetry data.
   Attributes? attributes;
 
   /// Creates a new [APITracer].
@@ -209,6 +213,23 @@ class APITracer {
   }
 
   /// Creates a span with specific options
+  /// Creates a span with the specified parameters without making it active in any context.
+  ///
+  /// This method provides fine-grained control over span creation, allowing you to specify
+  /// all aspects of the span including its context, parent, attributes, links, and more.
+  /// Unlike startSpan, this method does not set the span as active in any context.
+  ///
+  /// @param name The name of the span
+  /// @param spanContext Optional explicit span context to use
+  /// @param parentSpan Optional parent span for this span
+  /// @param kind The kind of span (client, server, etc.)
+  /// @param attributes Optional initial attributes for the span
+  /// @param links Optional links to other spans
+  /// @param spanEvents Optional initial events for the span
+  /// @param startTime Optional explicit start time for the span
+  /// @param isRecording Whether the span should record data
+  /// @param context Optional context to use for parent determination
+  /// @return A new APISpan instance that is not active in any context
   APISpan createSpan({
     required String name,
     SpanContext? spanContext,
@@ -265,31 +286,29 @@ class APITracer {
     // Validate parent span and span context compatibility
     if (parentSpan != null) {
       if (effectiveSpanContext.traceId != parentSpan.spanContext.traceId) {
-        throw ArgumentError('Parent and child span context traceIds must be the same');
+        throw ArgumentError(
+            'Parent and child span context traceIds must be the same');
       }
-      
+
       // Ensure child context has a proper parent span ID reference
-      if (effectiveSpanContext.parentSpanId == null || 
-          effectiveSpanContext.parentSpanId.toString() != parentSpan.spanContext.spanId.toString()) {
+      if (effectiveSpanContext.parentSpanId == null ||
+          effectiveSpanContext.parentSpanId.toString() !=
+              parentSpan.spanContext.spanId.toString()) {
         // Create a new span context with the proper parent span ID
         effectiveSpanContext = OTelFactory.otelFactory!.spanContext(
-          traceId: effectiveSpanContext.traceId,
-          spanId: effectiveSpanContext.spanId,
-          parentSpanId: parentSpan.spanContext.spanId,
-          traceFlags: effectiveSpanContext.traceFlags,
-          traceState: effectiveSpanContext.traceState,
-          isRemote: effectiveSpanContext.isRemote
-        );
+            traceId: effectiveSpanContext.traceId,
+            spanId: effectiveSpanContext.spanId,
+            parentSpanId: parentSpan.spanContext.spanId,
+            traceFlags: effectiveSpanContext.traceFlags,
+            traceState: effectiveSpanContext.traceState,
+            isRemote: effectiveSpanContext.isRemote);
       }
     }
 
     final apiSpan = APISpanCreate.create(
       name: name,
       instrumentationScope: InstrumentationScope(
-        name: this.name,
-        version: version,
-        attributes: attributes
-      ),
+          name: this.name, version: version, attributes: attributes),
       spanContext: effectiveSpanContext,
       parentSpan: parentSpan,
       spanKind: kind,

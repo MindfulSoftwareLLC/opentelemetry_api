@@ -1,11 +1,8 @@
 // Licensed under the Apache License, Version 2.0
 // Copyright 2025, Michael Bushe, All rights reserved.
 
-library context;
-
 import 'dart:async';
 import 'dart:convert';
-import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
@@ -15,6 +12,8 @@ import '../baggage/baggage.dart';
 import '../trace/span.dart';
 import '../trace/span_context.dart';
 import 'context_key.dart';
+// Use conditional imports to handle platform differences
+import 'isolate_support.dart' if (dart.library.js) 'isolate_support_web.dart';
 
 part 'context_create.dart';
 
@@ -23,9 +22,16 @@ part 'context_create.dart';
 /// Represents the immutable context containing active spans, baggage, and other data.
 @immutable
 class Context {
+  /// The key used to store context in zone values.
   static final _zoneKey = Object();
+
+  /// Holds the singleton root context instance.
   static Context? _rootContext;
+
+  /// Holds the current context for the application.
   static Context? _currentContext;
+
+  /// Cached reference to the OTelFactory for creating contexts.
   static OTelFactory? _otelFactory;
 
   /// The root context with no values
@@ -33,6 +39,10 @@ class Context {
     return _rootContext ??= _getAndCacheOTelFactory().context();
   }
 
+  /// Gets and caches the OTelFactory instance.
+  ///
+  /// Retrieves the global OTelFactory instance and caches it for future use.
+  /// Throws a StateError if OpenTelemetry has not been initialized.
   static OTelFactory _getAndCacheOTelFactory() {
     if (_otelFactory != null) {
       return _otelFactory!;
@@ -43,12 +53,18 @@ class Context {
     return _otelFactory = OTelFactory.otelFactory!;
   }
 
+  /// Gets the current Context from the current Zone, or the global Context if none exists.
+  ///
+  /// The search order is: current Zone, global current Context, root Context.
   static Context get current {
     return Zone.current[_zoneKey] as Context? ??
         _currentContext ??
         Context.root;
   }
 
+  /// Sets the global current Context.
+  ///
+  /// This updates the global current Context but does not affect Zone-specific contexts.
   static set current(Context newContext) {
     _currentContext = newContext;
   }
@@ -62,11 +78,17 @@ class Context {
     return newContext;
   }
 
+  /// Resets the current context to a new empty context.
+  ///
+  /// This is intended for testing purposes only and should not be used in production code.
   @visibleForTesting
   static void resetCurrent() {
     _currentContext = ContextCreate.create();
   }
 
+  /// Resets the root context to a new empty context.
+  ///
+  /// This is intended for testing purposes only and should not be used in production code.
   @visibleForTesting
   static void resetRoot() {
     _rootContext = ContextCreate.create();
@@ -88,7 +110,7 @@ class Context {
   const Context._(Map<ContextKey<Object?>, Object?>? contextValues)
       : _values = contextValues ?? const {};
 
-  /// The values stored in this context
+  /// The values stored in this context, mapped by their context keys.
   final Map<ContextKey<Object?>, Object?> _values;
 
   /// Gets the currently active span in this context, if any
@@ -108,10 +130,15 @@ class Context {
   // Returns the current context if it has baggage or makes a copy of the
   // current context with empty Baggage, sets it to Context.current and
   // returns it.
+  /// Returns the current context with Baggage, creating empty Baggage if needed.
+  ///
+  /// If the current context has no Baggage, this creates a new context with empty Baggage,
+  /// sets it as the current context, and returns it.
   static Context currentWithBaggage() {
     _getAndCacheOTelFactory();
     if (Context.current.baggage == null) {
-      Context.current = Context.current.copyWithBaggage(OTelFactory.otelFactory!.baggage({}));
+      Context.current =
+          Context.current.copyWithBaggage(OTelFactory.otelFactory!.baggage({}));
     }
     return Context.current;
   }
@@ -166,6 +193,10 @@ class Context {
 
   /// Gets the value added for the [ContextKey]
   /// Returns null if no value is set for this key or if the value's type doesn't match T
+  /// Gets a value from the context for the specified key.
+  ///
+  /// Returns null if the key is not present or if the value's type doesn't match T.
+  /// This prevents type casting errors when retrieving values.
   T? get<T>(ContextKey<T> key) {
     final value = _values[key];
     if (value == null) return null;
@@ -206,6 +237,10 @@ class Context {
   }
 
   /// Creates a new Context with the specified value for the given key
+  /// Creates a new Context with a new key-value pair added.
+  ///
+  /// This generates a new ContextKey with the given name and adds the value to a new Context.
+  /// A new unique ID is generated for the key.
   Context copyWithValue<T>(String name, T contextValue) {
     return ContextCreate.create(contextMap: {
       ..._values,
@@ -224,6 +259,10 @@ class Context {
 
   /// Creates a new Context adding in [moreBaggage], replacing any existing
   /// keys that are the same as the keys in [moreBaggage]
+  /// Creates a new Context with additional Baggage entries.
+  ///
+  /// This merges any existing Baggage with the new Baggage, with new entries
+  /// replacing existing entries that have the same keys.
   Context copyWithBaggage(Baggage moreBaggage) {
     final currentBaggage = baggage;
     final Baggage newBaggage = currentBaggage == null
@@ -235,6 +274,9 @@ class Context {
     });
   }
 
+  /// Creates a new Context with the given SpanContext.
+  ///
+  /// This sets only the span context and not an active span.
   Context copyWithSpanContext(SpanContext spanContext) {
     final newContext = ContextCreate.create(contextMap: {
       ..._values,
@@ -251,6 +293,12 @@ class Context {
     );
   }
 
+  /// Runs a computation in a new isolate with this context.
+  ///
+  /// This serializes the current context and factory configuration, passes them to
+  /// the new isolate, and then runs the computation with the context set in the new isolate.
+  ///
+  /// On web platforms, this will run in the current thread as web doesn't support isolates.
   Future<T> runIsolate<T>(Future<T> Function() computation) async {
     final oldFactory = _getAndCacheOTelFactory();
     // Capture the parent's factory configuration and serialize it.
@@ -286,6 +334,9 @@ class Context {
     }
   }
 
+  /// Serializes the context into a JSON-compatible map.
+  ///
+  /// This is used for passing context across isolate boundaries.
   Map<String, dynamic> serialize() {
     final values = <String, dynamic>{};
     final keyNamesCount = <String, int>{};
@@ -322,7 +373,8 @@ class Context {
           values[finalKeyName] = {
             'value': value,
             'uniqueId': key.uniqueId,
-            'originalKeyName': key.name, // Store original key name for deserialization
+            'originalKeyName':
+                key.name, // Store original key name for deserialization
           };
         } catch (e) {
           // Value is not serializable, skip it
@@ -333,6 +385,9 @@ class Context {
     return values;
   }
 
+  /// Deserializes a previously serialized context map back into a Context object.
+  ///
+  /// This is used when receiving context from another isolate.
   static Context deserialize(Map<String, dynamic> values) {
     _getAndCacheOTelFactory();
     var context = _otelFactory!.context();
@@ -363,8 +418,9 @@ class Context {
               Uint8List.fromList((value['uniqueId'] as List).cast<int>());
 
           // Get the original key name if available, otherwise use the key
-          final keyName = value.containsKey('originalKeyName') ?
-              value['originalKeyName'] as String : key;
+          final keyName = value.containsKey('originalKeyName')
+              ? value['originalKeyName'] as String
+              : key;
 
           // Note: Two keys with same name but different uniqueIds are valid and distinct
 
@@ -401,8 +457,7 @@ class Context {
       ..sort((a, b) => a.key.toString().compareTo(b.key.toString()));
 
     return Object.hashAll([
-      for (final entry in sortedEntries)
-        Object.hash(entry.key, entry.value)
+      for (final entry in sortedEntries) Object.hash(entry.key, entry.value)
     ]);
   }
 }

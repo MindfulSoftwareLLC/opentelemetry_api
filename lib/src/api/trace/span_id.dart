@@ -2,6 +2,7 @@
 // Copyright 2025, Michael Bushe, All rights reserved.
 
 library span_id;
+
 import 'dart:typed_data';
 import '../id/id_generator.dart';
 
@@ -10,8 +11,13 @@ part 'span_id_create.dart';
 /// A span identifier - an 8-byte array with an ID in a base-16 hex format.
 /// Follows W3C Trace Context specification.
 class SpanId {
+  /// The number of bytes in a span ID.
+  /// Per the OpenTelemetry specification, span IDs must be 8 bytes (64 bits).
   static const int spanIdLength = 8; // 8 bytes for SpanId
+  /// A span ID consisting of all zeros, representing an invalid span ID.
   static final Uint8List invalidSpanIdBytes = Uint8List(spanIdLength);
+
+  /// A SpanId instance representing an invalid span ID (all zeros).
   static final SpanId invalidSpanId = SpanId._(Uint8List(spanIdLength));
 
   /// The raw bytes of the span ID
@@ -24,6 +30,9 @@ class SpanId {
     }
   }
 
+  /// Returns a copy of the raw bytes of this SpanId.
+  ///
+  /// Returns a new Uint8List to prevent modification of the internal bytes.
   Uint8List get bytes => Uint8List.fromList(_bytes);
 
   /// Returns the lowercase base16 (hex) representation of the SpanId

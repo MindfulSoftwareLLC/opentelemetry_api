@@ -22,6 +22,7 @@ class Measurement<T extends num> {
   /// If null, empty attributes will be used.
   Measurement._(this.value, [this.attributes]);
 
+  /// Returns true if this measurement has non-empty attributes.
   bool get hasAttributes => attributes != null && attributes!.length > 0;
 
   @override
@@ -32,10 +33,10 @@ class Measurement<T extends num> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is Measurement &&
-              runtimeType == other.runtimeType &&
-              value == other.value &&
-              attributes == other.attributes;
+      other is Measurement &&
+          runtimeType == other.runtimeType &&
+          value == other.value &&
+          attributes == other.attributes;
 
   @override
   int get hashCode => value.hashCode ^ attributes.hashCode;

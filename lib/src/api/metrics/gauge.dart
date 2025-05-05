@@ -11,12 +11,30 @@ part 'gauge_create.dart';
 /// See the OpenTelemetry specification for more details:
 /// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#gauge
 class APIGauge<T extends num> {
+  /// The name of this gauge instrument.
   final String _name;
+
+  /// The optional description of this gauge instrument.
   final String? _description;
+
+  /// The optional unit of measure for this gauge instrument.
   final String? _unit;
+
+  /// Whether this gauge is enabled for recording measurements.
   final bool _enabled;
+
+  /// The meter that created this gauge instrument.
   final APIMeter _meter;
 
+  /// Creates a new [APIGauge] instrument.
+  ///
+  /// This constructor is typically not called directly. Instead, use [APIMeter.createGauge].
+  ///
+  /// [_name] The name of the gauge instrument.
+  /// [_description] Optional description of the gauge instrument.
+  /// [_unit] Optional unit of measurement for the gauge.
+  /// [_enabled] Whether this gauge is enabled for recording measurements.
+  /// [_meter] The meter that created this gauge instrument.
   APIGauge(
     this._name,
     this._description,
@@ -54,13 +72,21 @@ class APIGauge<T extends num> {
   /// [attributeMap] A map of attribute key-value pairs.
   void recordWithMap(T value, Map<String, Object> attributeMap) {
     // Convert map to Attributes and delegate to record
-    final attributes = attributeMap.isEmpty ? null : attributeMap.toAttributes();
+    final attributes =
+        attributeMap.isEmpty ? null : attributeMap.toAttributes();
     record(value, attributes);
   }
 
   /// Type identification getters
+  /// Returns false since this is not a Counter instrument.
   bool get isCounter => false;
+
+  /// Returns false since this is not an UpDownCounter instrument.
   bool get isUpDownCounter => false;
+
+  /// Returns true since this is a Gauge instrument.
   bool get isGauge => true;
+
+  /// Returns false since this is not a Histogram instrument.
   bool get isHistogram => false;
 }

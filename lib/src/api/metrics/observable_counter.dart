@@ -22,7 +22,8 @@ class APIObservableCounter<T extends num> {
   final List<ObservableCallback<T>> _callbacks = [];
 
   /// Creates a new observable counter instrument
-  APIObservableCounter(this._name, this._description, this._unit, this._enabled, this._meter, ObservableCallback<T>? callback) {
+  APIObservableCounter(this._name, this._description, this._unit, this._enabled,
+      this._meter, ObservableCallback<T>? callback) {
     if (callback != null) {
       addCallback(callback);
     }
@@ -66,7 +67,8 @@ class APIObservableCounter<T extends num> {
 }
 
 /// Default implementation of [APICallbackRegistration].
-class _CallbackRegistration<T extends num> implements APICallbackRegistration<T> {
+class _CallbackRegistration<T extends num>
+    implements APICallbackRegistration<T> {
   final APIObservableCounter<T> _instrument;
   final ObservableCallback<T> _callback;
 

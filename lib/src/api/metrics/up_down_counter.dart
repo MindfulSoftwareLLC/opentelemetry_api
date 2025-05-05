@@ -11,12 +11,30 @@ part 'up_down_counter_create.dart';
 /// See the OpenTelemetry specification for more details:
 /// https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/api.md#updowncounter
 class APIUpDownCounter<T extends num> {
+  /// The name of this up-down counter instrument.
   final String _name;
+
+  /// The optional description of this up-down counter instrument.
   final String? _description;
+
+  /// The optional unit of measure for this up-down counter instrument.
   final String? _unit;
+
+  /// Whether this up-down counter is enabled for recording measurements.
   final bool _enabled;
+
+  /// The meter that created this up-down counter instrument.
   final APIMeter _meter;
 
+  /// Creates a new [APIUpDownCounter] instrument.
+  ///
+  /// This constructor is typically not called directly. Instead, use [APIMeter.createUpDownCounter].
+  ///
+  /// [_name] The name of the up-down counter instrument.
+  /// [_description] Optional description of the up-down counter instrument.
+  /// [_unit] Optional unit of measurement for the up-down counter.
+  /// [_enabled] Whether this up-down counter is enabled for recording measurements.
+  /// [_meter] The meter that created this up-down counter instrument.
   APIUpDownCounter(
     this._name,
     this._description,
@@ -56,13 +74,21 @@ class APIUpDownCounter<T extends num> {
   /// [attributeMap] A map of attribute key-value pairs.
   void addWithMap(T value, Map<String, Object> attributeMap) {
     // Convert map to Attributes and delegate to add
-    final attributes = attributeMap.isEmpty ? null : attributeMap.toAttributes();
+    final attributes =
+        attributeMap.isEmpty ? null : attributeMap.toAttributes();
     add(value, attributes);
   }
 
   /// Type identification getters
+  /// Returns false since this is not a Counter instrument.
   bool get isCounter => false;
+
+  /// Returns true since this is an UpDownCounter instrument.
   bool get isUpDownCounter => true;
+
+  /// Returns false since this is not a Gauge instrument.
   bool get isGauge => false;
+
+  /// Returns false since this is not a Histogram instrument.
   bool get isHistogram => false;
 }

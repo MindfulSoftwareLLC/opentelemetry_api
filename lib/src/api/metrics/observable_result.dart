@@ -12,8 +12,8 @@ class APIObservableResult<T extends num> {
   /// Records a measurement with the given value and attributes.
   void observe(T value, [Attributes? attributes]) {
     _measurements ??= [];
-    _measurements!.add(
-          OTelFactory.otelFactory!.createMeasurement(value, attributes));
+    _measurements!
+        .add(OTelFactory.otelFactory!.createMeasurement(value, attributes));
   }
 
   /// Records a measurement with the given value and attributes as a map.
@@ -22,5 +22,6 @@ class APIObservableResult<T extends num> {
   }
 
   /// Get all recorded measurements
-  List<Measurement<T>> get measurements => List.unmodifiable(_measurements ?? []);
+  List<Measurement<T>> get measurements =>
+      List.unmodifiable(_measurements ?? []);
 }

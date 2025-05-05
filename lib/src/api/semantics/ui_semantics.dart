@@ -1,6 +1,8 @@
 // Licensed under the Apache License, Version 2.0
 // Copyright 2025, Michael Bushe, All rights reserved.
 
+// ignore_for_file: public_member_api_docs
+
 import 'package:opentelemetry_api/opentelemetry_api.dart';
 
 //TODO geo
@@ -23,6 +25,10 @@ enum AppLifecycleStates implements OTelSemantic {
 
   const AppLifecycleStates(this.key);
 
+  /// Converts a platform-specific lifecycle state string to the corresponding AppLifecycleStates enum value.
+  ///
+  /// [state] The platform-specific lifecycle state string (e.g., 'resumed', 'inactive')
+  /// Returns the matching AppLifecycleStates value, or AppLifecycleStates.active if no match is found.
   static AppLifecycleStates appLifecycleStateFor(String state) {
     if (state == 'detached') {
       return AppLifecycleStates.detached;
@@ -66,7 +72,6 @@ enum AppLifecycleSemantics implements OTelSemantic {
 
   const AppLifecycleSemantics(this.key);
 }
-
 
 /// RUM Semantic values for AppLifecycleSemantics.appStartType key
 enum AppStartType implements OTelSemantic {
@@ -122,14 +127,14 @@ enum DeviceSemantics implements OTelSemantic {
 enum BatterySemantics implements OTelSemantic {
   batteryLevel('battery.level'),
   batteryState('battery.state'),
+
   /// Battery state values
   batteryStateFull('battery.state.full'),
   batteryStateCharging('battery.state.charging'),
   batteryStateConnectedNotCharging('battery.state.connected_not_charging'),
   batteryStateDischanrging('battery.state.discharging'),
   batteryStateUnknown('battery.state.unknown'),
-  batterySaveMode('battery.save_mode')
-  ;
+  batterySaveMode('battery.save_mode');
 
   @override
   final String key;
@@ -139,7 +144,6 @@ enum BatterySemantics implements OTelSemantic {
 
   const BatterySemantics(this.key);
 }
-
 
 /// RUM Semantics related to navigation and routing
 enum NavigationSemantics implements OTelSemantic {

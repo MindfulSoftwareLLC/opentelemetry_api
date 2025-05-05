@@ -22,10 +22,19 @@ part 'meter_provider_create.dart';
 /// See [OTel] for creating meters in addition to the default.
 /// Use [OTelAPI] to run in no-op mode, as required by the specification.
 class APIMeterProvider {
+  /// The endpoint URL where metrics data is sent.
   String _endpoint;
+
+  /// The name of the service being instrumented.
   String _serviceName;
+
+  /// The version of the service being instrumented.
   String? _serviceVersion;
+
+  /// Whether this meter provider is enabled.
+  /// API implementation defaults to false, while SDK defaults to true.
   bool _enabled = false; // API, SDK defaults true
+  /// Whether this meter provider has been shut down.
   bool _isShutdown;
 
   // Cache for created meters, keyed by _MeterKey.
@@ -47,8 +56,10 @@ class APIMeterProvider {
         _enabled = enabled,
         _isShutdown = isShutdown;
 
+  /// Gets the endpoint URL where metrics data is sent.
   String get endpoint => _endpoint;
 
+  /// Sets the endpoint URL where metrics data is sent.
   set endpoint(String value) {
     _endpoint = value;
   }
@@ -59,7 +70,11 @@ class APIMeterProvider {
   /// [version] The version of the instrumented library.
   /// [schemaUrl] Optional URL of the OpenTelemetry schema being used.
   /// [attributes] Optional Attributes for the Meter.
-  APIMeter getMeter({required String name, String? version, String? schemaUrl, Attributes? attributes}) {
+  APIMeter getMeter(
+      {required String name,
+      String? version,
+      String? schemaUrl,
+      Attributes? attributes}) {
     if (_isShutdown) {
       throw StateError('MeterProvider has been shut down');
     }
@@ -67,7 +82,8 @@ class APIMeterProvider {
     // Validate the meter name; if invalid (empty), log a warning and use empty string.
     final validatedName = name.isEmpty ? '' : name;
     if (validatedName.isEmpty) {
-      OTelLog.warn('Invalid meter name provided; using empty string as fallback.');
+      OTelLog.warn(
+          'Invalid meter name provided; using empty string as fallback.');
     }
 
     // Create a cache key based on the provided parameters.
@@ -87,26 +103,35 @@ class APIMeterProvider {
     }
   }
 
+  /// Gets the name of the service being instrumented.
   String get serviceName => _serviceName;
 
+  /// Sets the name of the service being instrumented.
   set serviceName(String value) {
     _serviceName = value;
   }
 
+  /// Gets the version of the service being instrumented.
   String? get serviceVersion => _serviceVersion;
 
+  /// Sets the version of the service being instrumented.
   set serviceVersion(String? value) {
     _serviceVersion = value;
   }
 
+  /// Gets whether this meter provider is enabled.
   bool get enabled => _enabled;
 
+  /// Sets whether this meter provider is enabled.
   set enabled(bool value) {
     _enabled = value;
   }
 
+  /// Gets whether this meter provider has been shut down.
   bool get isShutdown => _isShutdown;
 
+  /// Sets whether this meter provider has been shut down.
+  /// This should only be called internally during the shutdown process.
   set isShutdown(bool value) {
     _isShutdown = value;
   }
@@ -119,7 +144,7 @@ class APIMeterProvider {
   /// Returns true if shutdown was successful.
   Future<bool> shutdown() async {
     if (_isShutdown) {
-      return true;  // Already shut down
+      return true; // Already shut down
     }
 
     try {
@@ -145,7 +170,7 @@ class APIMeterProvider {
   /// Returns true if the flush was successful, false otherwise.
   Future<bool> forceFlush() async {
     if (_isShutdown) {
-      return false;  // Already shut down
+      return false; // Already shut down
     }
 
     try {

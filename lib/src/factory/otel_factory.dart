@@ -30,6 +30,7 @@ import '../api/metrics/observable_up_down_counter.dart';
 import '../api/trace/span_context.dart';
 import '../api/trace/span_link.dart';
 
+/// A function that creates the OTel Factory, used bu initialize methods
 typedef OTelFactoryCreationFunction = OTelFactory Function(
     {required String apiEndpoint,
     required String apiServiceName,
@@ -40,6 +41,7 @@ typedef OTelFactoryCreationFunction = OTelFactory Function(
 /// SDK installed.  The API uses the `OTelAPIFactory` as a default.
 /// SDKs override this default by registering their own APIFactory
 abstract class OTelFactory {
+  /// Default OTel endpoint url
   static const defaultEndpoint = 'http://localhost:4317';
 
   /// SDKs must replace this otelFactory with their own to get the SDK
@@ -57,6 +59,15 @@ abstract class OTelFactory {
   /// across process boundaries, i.e. isolates
   final OTelFactoryCreationFunction factoryFactory;
 
+  /// Creates a new OTelFactory with the specified parameters.
+  ///
+  /// This constructor is used by SDKs to replace the default API implementation.
+  /// Factory objects are responsible for creating API implementations appropriate for their SDK.
+  ///
+  /// @param apiEndpoint The endpoint to send telemetry to
+  /// @param apiServiceName The name of the service being instrumented
+  /// @param apiServiceVersion The version of the service being instrumented
+  /// @param factoryFactory Factory method that can reconstruct this factory type across process boundaries
   OTelFactory(
       {required String apiEndpoint,
       required String apiServiceName,
@@ -66,14 +77,29 @@ abstract class OTelFactory {
         _apiServiceName = apiServiceName,
         _apiEndpoint = apiEndpoint;
 
+  /// Sets the API endpoint for this factory.
+  ///
+  /// This determines where telemetry data will be sent when using SDK implementations.
+  ///
+  /// @param value The endpoint URL to use for sending telemetry
   set apiEndpoint(String value) {
     _apiEndpoint = value;
   }
 
+  /// Sets the service name for this factory.
+  ///
+  /// This determines the service name that will be used in telemetry data.
+  ///
+  /// @param value The service name to use
   set apiServiceName(String value) {
     _apiServiceName = value;
   }
 
+  /// Sets the service version for this factory.
+  ///
+  /// This determines the service version that will be used in telemetry data.
+  ///
+  /// @param value The service version to use
   set apiServiceVersion(String value) {
     _apiServiceVersion = value;
   }
@@ -257,23 +283,27 @@ abstract class OTelFactory {
   APICounter createCounter(String name, {String? description, String? unit});
 
   /// Creates a [APIUpDownCounter] instrument with the given name
-  APIUpDownCounter createUpDownCounter(String name, {String? description, String? unit});
+  APIUpDownCounter createUpDownCounter(String name,
+      {String? description, String? unit});
 
   /// Creates a [APIGauge] instrument with the given name
   APIGauge createGauge(String name, {String? description, String? unit});
 
   /// Creates a [APIHistogram] instrument with the given name
-  APIHistogram createHistogram(String name, {String? description, String? unit, List<double>? boundaries});
+  APIHistogram createHistogram(String name,
+      {String? description, String? unit, List<double>? boundaries});
 
   /// Creates an [APIObservableCounter] instrument with the given name
-  APIObservableCounter createObservableCounter(String name, {String? description, String? unit, ObservableCallback? callback});
+  APIObservableCounter createObservableCounter(String name,
+      {String? description, String? unit, ObservableCallback? callback});
 
   /// Creates an [APIObservableGauge] instrument with the given name
-  APIObservableGauge createObservableGauge(String name, {String? description, String? unit, ObservableCallback? callback});
+  APIObservableGauge createObservableGauge(String name,
+      {String? description, String? unit, ObservableCallback? callback});
 
   /// Creates an [APIObservableUpDownCounter] instrument with the given name
-  APIObservableUpDownCounter createObservableUpDownCounter(String name, {String? description, String? unit, ObservableCallback? callback});
-
+  APIObservableUpDownCounter createObservableUpDownCounter(String name,
+      {String? description, String? unit, ObservableCallback? callback});
 
   ///Creates a span context. Random trace and span ids
   ///will be generated if not provided.
@@ -285,6 +315,10 @@ abstract class OTelFactory {
       TraceState? traceState,
       bool? isRemote = false});
 
+  /// Resets the factory to its initial state.
+  ///
+  /// This clears all cached providers and resets the factory configuration to defaults.
+  /// This method is primarily used for testing purposes.
   void reset() {
     _apiEndpoint = defaultEndpoint;
     _apiServiceName = OTelAPI.defaultServiceName;
@@ -298,7 +332,15 @@ abstract class OTelFactory {
     otelFactory = null;
   }
 
-  Measurement<T> createMeasurement<T extends num>(T value, [Attributes? attributes]) {
+  /// Creates a measurement with the given value and optional attributes.
+  ///
+  /// Measurements are used with metric instruments to record data points.
+  ///
+  /// @param value The numeric value of the measurement
+  /// @param attributes Optional attributes to associate with this measurement
+  /// @return A new Measurement instance
+  Measurement<T> createMeasurement<T extends num>(T value,
+      [Attributes? attributes]) {
     return MeasurementCreate.create(value, attributes);
   }
 }

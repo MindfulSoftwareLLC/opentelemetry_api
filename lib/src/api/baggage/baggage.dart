@@ -1,8 +1,6 @@
 // Licensed under the Apache License, Version 2.0
 // Copyright 2025, Michael Bushe, All rights reserved.
 
-library baggage;
-
 import 'package:meta/meta.dart';
 import 'package:opentelemetry_api/opentelemetry_api.dart';
 
@@ -20,7 +18,8 @@ class Baggage {
   /// Creates a new baggage instance. The provided entries map is copied
   /// and made immutable to ensure baggage immutability. Defaults to empty.
   Baggage._([Map<String, BaggageEntry>? entries])
-      : _entries = Map.unmodifiable(Map<String, BaggageEntry>.from(entries ?? {})) {
+      : _entries =
+            Map.unmodifiable(Map<String, BaggageEntry>.from(entries ?? {})) {
     // Validate that no keys are empty strings
     for (final key in _entries.keys) {
       if (key.isEmpty) {
@@ -54,25 +53,27 @@ class Baggage {
   /// Creates a new Context adding in [moreBaggage], replacing any existing
   /// keys that are the same as the keys in [moreBaggage]
   Baggage copyWithBaggage(Baggage moreBaggage) {
-    final combined = {
-      ..._entries,
-      ...moreBaggage._entries
-    };
+    final combined = {..._entries, ...moreBaggage._entries};
     return OTelFactory.otelFactory!.baggage(combined);
   }
 
-    /// Returns a new Baggage with the given key-value pair added (or replaced).
+  /// Returns a new Baggage with the given key-value pair added (or replaced).
   Baggage copyWith(String key, String value, [String? metadata]) {
     if (key.isEmpty) throw ArgumentError('Baggage key must not be empty');
     if (value.isEmpty) throw ArgumentError('Baggage value must not be empty');
-    if (OTelFactory.otelFactory == null) throw StateError('Call initialize() first.');
-    final updated = Map.of(_entries)..[key] = OTelFactory.otelFactory!.baggageEntry(value, metadata);
+    if (OTelFactory.otelFactory == null) {
+      throw StateError('Call initialize() first.');
+    }
+    final updated = Map.of(_entries)
+      ..[key] = OTelFactory.otelFactory!.baggageEntry(value, metadata);
     return OTelFactory.otelFactory!.baggage(updated);
   }
 
   /// Returns a new Baggage with the given key removed (if it exists).
   Baggage copyWithout(String key) {
-    if (OTelFactory.otelFactory == null) throw StateError('Call initialize() first.');
+    if (OTelFactory.otelFactory == null) {
+      throw StateError('Call initialize() first.');
+    }
     if (!_entries.containsKey(key)) return this;
     final updated = Map.of(_entries)..remove(key);
     return OTelFactory.otelFactory!.baggage(updated);
@@ -91,7 +92,9 @@ class Baggage {
   /// Creates a baggage instance from a JSON representation.
   /// JSON format must be: { key: { value: string, metadata?: string } }
   factory Baggage.fromJson(Map<String, dynamic> json) {
-    if (OTelFactory.otelFactory == null) throw StateError('Call initialize() first.');
+    if (OTelFactory.otelFactory == null) {
+      throw StateError('Call initialize() first.');
+    }
     final entries = <String, BaggageEntry>{};
     for (final entry in json.entries) {
       if (entry.value is Map) {
@@ -117,20 +120,23 @@ class Baggage {
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is Baggage &&
-            _mapEquals(_entries, other._entries));
+        (other is Baggage && _mapEquals(_entries, other._entries));
   }
 
   @override
   int get hashCode {
     return _entries.entries.fold(0, (hash, entry) {
-      final entryHash = Object.hash(entry.key, Object.hash(entry.value.value, entry.value.metadata));
+      final entryHash = Object.hash(
+          entry.key, Object.hash(entry.value.value, entry.value.metadata));
       return hash ^ entryHash;
     });
   }
 
+  /// Returns true if this Baggage contains no entries.
   bool get isEmpty => _entries.isEmpty;
 
+  /// Utility method to compare two maps of [BaggageEntry] objects.
+  /// Returns true if both maps have the same keys and values.
   bool _mapEquals(Map<String, BaggageEntry> a, Map<String, BaggageEntry> b) {
     if (a.length != b.length) return false;
     for (final key in a.keys) {

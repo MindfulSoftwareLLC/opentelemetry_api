@@ -5,9 +5,16 @@ import '../../../opentelemetry_api.dart';
 
 /// Represents the instrumentation scope information.
 class InstrumentationScope {
+  /// The instrumentation scope name (e.g. 'io.opentelemetry.contrib.mongodb').
   final String name;
+
+  /// The version of the instrumentation scope, or null if not specified.
   final String? version;
+
+  /// The Schema URL, or null if not specified.
   final String? schemaUrl;
+
+  /// The instrumentation scope attributes, or null if not specified.
   final Attributes? attributes;
 
   /// Creates a new InstrumentationScope.

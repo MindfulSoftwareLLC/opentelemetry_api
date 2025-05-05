@@ -11,23 +11,23 @@ class TraceStateCreate {
     if (entries == null || entries.isEmpty) {
       return TraceState._({});
     }
-    
+
     // Enforce 32 key-value pair limit
     if (entries.length > 32) {
       // Take only the first 32 entries
       final limitedEntries = <String, String>{};
       var count = 0;
-      
+
       for (final entry in entries.entries) {
         if (count >= 32) break;
-        
+
         limitedEntries[entry.key] = entry.value;
         count++;
       }
-      
+
       return TraceState._(limitedEntries);
     }
-    
+
     return TraceState._(entries);
   }
 }

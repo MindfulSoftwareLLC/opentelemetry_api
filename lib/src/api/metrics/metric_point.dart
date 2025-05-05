@@ -8,10 +8,10 @@ import 'package:opentelemetry_api/opentelemetry_api.dart';
 class MetricPoint {
   /// The timestamp when this point was recorded.
   final DateTime timestamp;
-  
+
   /// The value recorded at this point.
   final num value;
-  
+
   /// The attributes associated with this point.
   final Attributes attributes;
 

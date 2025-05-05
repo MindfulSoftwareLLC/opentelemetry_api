@@ -14,10 +14,17 @@ import '../../opentelemetry_api.dart';
 /// [OTelFactory] to [OTelAPIFactory].
 /// The rest of the methods act like factory constructors for OTelAPI classes.
 class OTelAPI {
+  /// Default service name used when no service name is provided.
   static const String defaultServiceName = '@dart/opentelemetry_api';
-  static const String defaultServiceVersion = '1.11.0.0';
-  static const String defaultSchemaUrl = 'https://opentelemetry.io/schemas/1.11.0';
 
+  /// Default service version, matching the OpenTelemetry specification version.
+  static const String defaultServiceVersion = '1.11.0.0';
+
+  /// Default schema URL for the OpenTelemetry specification.
+  static const String defaultSchemaUrl =
+      'https://opentelemetry.io/schemas/1.11.0';
+
+  /// Cached reference to the global OTelFactory instance.
   static OTelFactory? _otelFactory;
 
   /// Typically developers will want to initialize [OTel] (the SDK),
@@ -72,7 +79,8 @@ class OTelAPI {
   /// The name is for debugging purposes only.
   static ContextKey<T> contextKey<T>(String name) {
     _getAndCacheOtelFactory();
-    return OTelFactory.otelFactory!.contextKey(name, ContextKey.generateContextKeyId());
+    return OTelFactory.otelFactory!
+        .contextKey(name, ContextKey.generateContextKeyId());
   }
 
   /// Creates a new [Context] with optional [Baggage]
@@ -141,13 +149,21 @@ class OTelAPI {
 
   /// Get the default or named tracer from the global TracerProvider
   static APITracer tracer(String name) {
-    return OTelFactory.otelFactory!.globalDefaultTracerProvider().getTracer(name);
+    return OTelFactory.otelFactory!
+        .globalDefaultTracerProvider()
+        .getTracer(name);
   }
 
+  /// Creates a TraceId from the provided bytes.
+  ///
+  /// [traceIdBytes] The bytes to use for the TraceId.
   static TraceId traceIdFromBytes(List<int> traceIdBytes) {
     return TraceIdCreate.create(Uint8List.fromList(traceIdBytes));
   }
 
+  /// Creates a SpanId from the provided bytes.
+  ///
+  /// [traceIdBytes] The bytes to use for the SpanId.
   static SpanId spanIdFromBytes(List<int> traceIdBytes) {
     return SpanIdCreate.create(Uint8List.fromList(traceIdBytes));
   }
@@ -164,13 +180,13 @@ class OTelAPI {
       TraceState? traceState,
       bool? isRemote = false}) {
     _getAndCacheOtelFactory();
-    
+
     // If parentSpanId is provided but invalid, treat it as null
     SpanId? effectiveParentSpanId = parentSpanId;
     if (effectiveParentSpanId != null && !effectiveParentSpanId.isValid) {
       effectiveParentSpanId = null;
     }
-    
+
     return OTelFactory.otelFactory!.spanContext(
       traceId: traceId ?? OTelAPI.traceId(),
       spanId: spanId ?? OTelAPI.spanId(),
@@ -193,6 +209,9 @@ class OTelAPI {
     return OTelFactory.otelFactory!.spanContextInvalid();
   }
 
+  /// Creates a span event with the current timestamp.
+  ///
+  /// This is a convenience method that calls [spanEvent] with the current time.
   static SpanEvent spanEventNow(String name, Attributes attributes) {
     _getAndCacheOtelFactory();
     return spanEvent(name, attributes, DateTime.now());
@@ -301,8 +320,14 @@ class OTelAPI {
     return OTelFactory.otelFactory!.attributes(entries);
   }
 
-  static Attributes attributesFromSemanticMap(Map<OTelSemantic, Object> semanticMap) {
-    return attributesFromMap(semanticMap.map((key, value) =>  key.toMapEntry(value)));
+  /// Creates Attributes from a map of semantic attributes to their values.
+  ///
+  /// This converts each OTelSemantic key to its string representation and creates
+  /// appropriate attribute values based on the value types.
+  static Attributes attributesFromSemanticMap(
+      Map<OTelSemantic, Object> semanticMap) {
+    return attributesFromMap(
+        semanticMap.map((key, value) => key.toMapEntry(value)));
   }
 
   /// Creates an empty `Attributes` collection from a named set of values.
@@ -317,29 +342,57 @@ class OTelAPI {
     return OTelAPIFactory.attrsFromMap(namedMap);
   }
 
+  /// Creates attributes from a list of individual attribute objects.
+  ///
+  /// This converts a list of Attribute objects into a single Attributes collection.
+  ///
+  /// @param attributeList The list of attributes to include in the collection
+  /// @return A new Attributes instance containing all the provided attributes
   static Attributes attributesFromList(List<Attribute> attributeList) {
     _getAndCacheOtelFactory();
     return OTelFactory.otelFactory!.attributesFromList(attributeList);
   }
 
+  /// Creates a TraceState object with the specified entries.
+  ///
+  /// TraceState carries system-specific configuration and routing data as a set of key-value pairs.
+  ///
+  /// @param entries Map of key-value pairs to include in the trace state
+  /// @return A new TraceState instance
   static TraceState traceState(Map<String, String>? entries) {
     _getAndCacheOtelFactory();
     return OTelFactory.otelFactory!.traceState(entries);
   }
 
+  /// Creates a TraceFlags object with the specified flags.
+  ///
+  /// TraceFlags represents options for a trace, such as sampling decision.
+  ///
+  /// @param flags Optional integer representing the trace flags, defaults to NONE_FLAG
+  /// @return A new TraceFlags instance
   static TraceFlags traceFlags([int? flags]) {
     _getAndCacheOtelFactory();
     return OTelFactory.otelFactory!.traceFlags(flags ?? TraceFlags.NONE_FLAG);
   }
 
+  /// Creates a new random TraceId.
+  ///
+  /// This generates a new random trace ID using the ID generator.
   static TraceId traceId() {
     return traceIdOf(IdGenerator.generateTraceId());
   }
 
+  /// Creates an invalid TraceId (all zeros).
+  ///
+  /// This is a convenience method that calls [traceIdInvalid].
   static TraceId invalidTraceId() {
     return traceIdOf(TraceId.invalidTraceIdBytes);
   }
 
+  /// Creates a TraceId from the provided raw bytes.
+  ///
+  /// [traceId] Must be exactly 16 bytes.
+  /// Throws ArgumentError if the length is not 16 bytes.
   static TraceId traceIdOf(Uint8List traceId) {
     _getAndCacheOtelFactory();
     if (traceId.length != TraceId.traceIdLength) {
@@ -391,7 +444,8 @@ class OTelAPI {
     try {
       final bytes = IdGenerator.hexToBytes(hexString);
       if (bytes == null || bytes.length != SpanId.spanIdLength) {
-        throw const FormatException('SpanId must be ${SpanId.spanIdLength} bytes');
+        throw const FormatException(
+            'SpanId must be ${SpanId.spanIdLength} bytes');
       }
       return OTelFactory.otelFactory!.spanId(bytes);
     } catch (e) {
@@ -404,6 +458,13 @@ class OTelAPI {
     return spanIdOf(SpanId.invalidSpanIdBytes);
   }
 
+  /// Creates a SpanLink with the specified span context and attributes.
+  ///
+  /// Span links are used to associate a span with other spans that have a causal relationship.
+  ///
+  /// @param spanContext The span context to link to
+  /// @param attributes Attributes to associate with this link
+  /// @return A new SpanLink instance
   static SpanLink spanLink(SpanContext spanContext, Attributes attributes) {
     _getAndCacheOtelFactory();
     return OTelFactory.otelFactory!
@@ -411,49 +472,101 @@ class OTelAPI {
   }
 
   /// Creates a counter instrument
-  static APICounter createCounter(String name, {String? description, String? unit}) {
+  /// Creates a counter instrument with the specified name, description, and unit.
+  ///
+  /// This is a convenience method that delegates to the global meter provider.
+  ///
+  /// [name] The name of the counter instrument.
+  /// [description] Optional description of the counter instrument.
+  /// [unit] Optional unit of measurement for the counter.
+  ///
+  /// Returns a new [APICounter] instance.
+  static APICounter createCounter(String name,
+      {String? description, String? unit}) {
     _getAndCacheOtelFactory();
-    return OTelFactory.otelFactory!.createCounter(name, description: description, unit: unit);
+    return OTelFactory.otelFactory!
+        .createCounter(name, description: description, unit: unit);
   }
 
-  /// Creates an up-down counter instrument
-  static APIUpDownCounter createUpDownCounter(String name, {String? description, String? unit}) {
+  /// Creates an up-down counter instrument with the specified name, description, and unit.
+  ///
+  /// This is a convenience method that delegates to the global meter provider.
+  ///
+  /// [name] The name of the up-down counter instrument.
+  /// [description] Optional description of the up-down counter instrument.
+  /// [unit] Optional unit of measurement for the up-down counter.
+  ///
+  /// Returns a new [APIUpDownCounter] instance.
+  static APIUpDownCounter createUpDownCounter(String name,
+      {String? description, String? unit}) {
     _getAndCacheOtelFactory();
-    return OTelFactory.otelFactory!.createUpDownCounter(name, description: description, unit: unit);
+    return OTelFactory.otelFactory!
+        .createUpDownCounter(name, description: description, unit: unit);
   }
 
-  /// Creates a gauge instrument
-  static APIGauge createGauge(String name, {String? description, String? unit}) {
+  /// Creates a gauge instrument with the specified name, description, and unit.
+  ///
+  /// This is a convenience method that delegates to the global meter provider.
+  ///
+  /// [name] The name of the gauge instrument.
+  /// [description] Optional description of the gauge instrument.
+  /// [unit] Optional unit of measurement for the gauge.
+  ///
+  /// Returns a new [APIGauge] instance.
+  static APIGauge createGauge(String name,
+      {String? description, String? unit}) {
     _getAndCacheOtelFactory();
-    return OTelFactory.otelFactory!.createGauge(name, description: description, unit: unit);
+    return OTelFactory.otelFactory!
+        .createGauge(name, description: description, unit: unit);
   }
 
-  /// Creates a histogram instrument
-  static APIHistogram createHistogram(String name, {String? description, String? unit, List<double>? boundaries}) {
+  /// Creates a histogram instrument with the specified name, description, unit, and boundaries.
+  ///
+  /// This is a convenience method that delegates to the global meter provider.
+  ///
+  /// [name] The name of the histogram instrument.
+  /// [description] Optional description of the histogram instrument.
+  /// [unit] Optional unit of measurement for the histogram.
+  /// [boundaries] Optional explicit bucket boundaries for the histogram.
+  ///
+  /// Returns a new [APIHistogram] instance.
+  static APIHistogram createHistogram(String name,
+      {String? description, String? unit, List<double>? boundaries}) {
     _getAndCacheOtelFactory();
-    return OTelFactory.otelFactory!.createHistogram(name, description: description, unit: unit, boundaries: boundaries);
+    return OTelFactory.otelFactory!.createHistogram(name,
+        description: description, unit: unit, boundaries: boundaries);
   }
 
   /// Creates an observable counter instrument
-  static APIObservableCounter createObservableCounter(String name, {String? description, String? unit, ObservableCallback? callback}) {
+  static APIObservableCounter createObservableCounter(String name,
+      {String? description, String? unit, ObservableCallback? callback}) {
     _getAndCacheOtelFactory();
-    return OTelFactory.otelFactory!.createObservableCounter(name, description: description, unit: unit, callback: callback);
+    return OTelFactory.otelFactory!.createObservableCounter(name,
+        description: description, unit: unit, callback: callback);
   }
 
   /// Creates an observable gauge instrument
-  static APIObservableGauge createObservableGauge(String name, {String? description, String? unit, ObservableCallback? callback}) {
+  static APIObservableGauge createObservableGauge(String name,
+      {String? description, String? unit, ObservableCallback? callback}) {
     _getAndCacheOtelFactory();
-    return OTelFactory.otelFactory!.createObservableGauge(name, description: description, unit: unit, callback: callback);
+    return OTelFactory.otelFactory!.createObservableGauge(name,
+        description: description, unit: unit, callback: callback);
   }
 
   /// Creates an observable up-down counter instrument
-  static APIObservableUpDownCounter createObservableUpDownCounter(String name, {String? description, String? unit, ObservableCallback? callback}) {
+  static APIObservableUpDownCounter createObservableUpDownCounter(String name,
+      {String? description, String? unit, ObservableCallback? callback}) {
     _getAndCacheOtelFactory();
-    return OTelFactory.otelFactory!.createObservableUpDownCounter(name, description: description, unit: unit, callback: callback);
+    return OTelFactory.otelFactory!.createObservableUpDownCounter(name,
+        description: description, unit: unit, callback: callback);
   }
 
   /// Creates an observable up-down counter instrument
-  static Measurement<T> createMeasurement<T extends num>(T value, [Attributes? attributes]) {
+  /// Creates a measurement with the given value and optional attributes.
+  ///
+  /// A measurement is a value recorded by a metric instrument.
+  static Measurement<T> createMeasurement<T extends num>(T value,
+      [Attributes? attributes]) {
     _getAndCacheOtelFactory();
     return OTelFactory.otelFactory!.createMeasurement(value, attributes);
   }
@@ -479,5 +592,4 @@ class OTelAPI {
     // ignore: invalid_use_of_visible_for_testing_member
     Context.resetCurrent();
   }
-
 }

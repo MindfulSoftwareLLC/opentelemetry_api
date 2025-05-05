@@ -15,7 +15,11 @@ part 'trace_id_create.dart';
 /// TraceId follows the W3C Trace Context specification.
 @immutable
 class TraceId {
+  /// The number of bytes in a trace ID.
+  /// Per the OpenTelemetry specification, trace IDs must be 16 bytes (128 bits).
   static const int traceIdLength = 16;
+
+  /// A trace ID consisting of all zeros, representing an invalid trace ID.
   static final Uint8List invalidTraceIdBytes = Uint8List(traceIdLength);
 
   /// The raw bytes of the trace ID
@@ -40,9 +44,9 @@ class TraceId {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is TraceId &&
-              runtimeType == other.runtimeType &&
-              toString() == other.toString();
+      other is TraceId &&
+          runtimeType == other.runtimeType &&
+          toString() == other.toString();
 
   @override
   int get hashCode => toString().hashCode;

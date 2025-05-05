@@ -15,7 +15,8 @@ class SpanContextCreate {
     bool? isRemote = false,
   }) {
     // For root spans, ensure the parentSpanId is set to zeros (invalid span ID)
-    final effectiveParentSpanId = parentSpanId ?? OTelFactory.otelFactory!.spanIdInvalid();
+    final effectiveParentSpanId =
+        parentSpanId ?? OTelFactory.otelFactory!.spanIdInvalid();
 
     return SpanContext._(
         traceId: traceId ?? OTelFactory.otelFactory!.traceId(),

@@ -1,8 +1,6 @@
 // Licensed under the Apache License, Version 2.0
 // Copyright 2025, Michael Bushe, All rights reserved.
 
-library span;
-
 import 'package:meta/meta.dart';
 import '../../../opentelemetry_api.dart';
 
@@ -416,10 +414,18 @@ class APISpan {
       if (_spanStatusCode == null || _spanStatusCode == SpanStatusCode.Unset) {
         _spanStatusCode = spanStatus ?? SpanStatusCode.Ok;
       }
-
     }
   }
 
+  /// Adds multiple attributes to the span at once by merging with existing attributes.
+  /// This is more efficient than calling individual attribute setters when you need to add
+  /// multiple attributes.
+  ///
+  /// Adding attributes at span creation is preferred to calling this method later,
+  /// as samplers can only consider information already present during span creation.
+  ///
+  /// @param attributes The attributes to add to this span
+  /// @return void
   void addAttributes(Attributes attributes) {
     if (!isEnded) {
       _attributes = _attributes.copyWithAttributes(attributes);
@@ -442,5 +448,4 @@ class APISpan {
   String toString() {
     return 'APISpan{_name: $_name, _spanContext: $_spanContext, _spankind: $_spankind, _parentSpan: $_parentSpan, _instrumentationScope: $_instrumentationScope, _startTime: $_startTime, _endTime: $_endTime, _attributes: $_attributes, _spanEvents: $_spanEvents, _spanLinks: $_spanLinks, _spanStatusCode: $_spanStatusCode, _statusDescription: $_statusDescription}';
   }
-
 }

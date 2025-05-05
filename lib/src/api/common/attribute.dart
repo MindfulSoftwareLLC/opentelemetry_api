@@ -11,10 +11,15 @@ part 'attribute_create.dart';
 /// Represents a value for an attribute, associated with an attribute key.
 @immutable
 class Attribute<T extends Object> {
-  // For deep equality checks (e.g., for lists)
-  static final DeepCollectionEquality _listEquality = const DeepCollectionEquality();
+  /// The DeepCollectionEquality object used for comparing list values.
+  /// This enables proper element-by-element comparisons for lists.
+  static final DeepCollectionEquality _listEquality =
+      const DeepCollectionEquality();
 
+  /// The key (name) of this attribute.
   final String _key;
+
+  /// The value of this attribute.
   final T _value;
 
   Attribute._(String key, T value)
@@ -34,8 +39,10 @@ class Attribute<T extends Object> {
     }
   }
 
+  /// Gets the key (name) of this attribute.
   String get key => _key;
 
+  /// Gets the value of this attribute.
   T get value => _value;
 
   @override
@@ -54,13 +61,16 @@ class Attribute<T extends Object> {
         ? _listEquality.equals(value, other.value)
         : value == other.value;
 
-    return runtimeType == other.runtimeType && key == other.key && valuesAreEqual;
+    return runtimeType == other.runtimeType &&
+        key == other.key &&
+        valuesAreEqual;
   }
 
   @override
   int get hashCode {
     // Use deep hash for lists, otherwise default hash
-    final valueHash = value is List ? _listEquality.hash(value) : value.hashCode;
+    final valueHash =
+        value is List ? _listEquality.hash(value) : value.hashCode;
     return Object.hash(key, valueHash);
   }
 }

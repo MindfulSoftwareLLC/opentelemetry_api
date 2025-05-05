@@ -15,6 +15,13 @@ class APIInstrument {
   final bool _enabled;
   final APIMeter _meter;
 
+  /// Creates a new instrument with the specified parameters.
+  ///
+  /// [name] The name of the instrument (required).
+  /// [unit] The optional unit of measurement.
+  /// [description] An optional human-readable description.
+  /// [enabled] Whether the instrument is enabled and will record measurements.
+  /// [meter] The meter that created this instrument.
   APIInstrument({
     required String name,
     String? unit,

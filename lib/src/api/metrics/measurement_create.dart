@@ -8,7 +8,8 @@ class MeasurementCreate<T extends num> {
   /// Creates a new [Measurement] instance.
   /// This is an implementation detail and should not be used directly.
   /// Use [APIMeter.createMeasurement()] instead.
-  static Measurement<T> create<T extends num>(T value, [Attributes? attributes]) {
+  static Measurement<T> create<T extends num>(T value,
+      [Attributes? attributes]) {
     return Measurement<T>._(value, attributes);
   }
 }

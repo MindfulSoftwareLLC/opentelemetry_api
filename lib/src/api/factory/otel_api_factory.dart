@@ -3,7 +3,8 @@
 
 import 'dart:typed_data';
 
-import 'package:opentelemetry_api/opentelemetry_api.dart' show OTelAPI, Timestamp;
+import 'package:opentelemetry_api/opentelemetry_api.dart'
+    show OTelAPI, Timestamp;
 import 'package:opentelemetry_api/src/api/baggage/baggage.dart';
 import 'package:opentelemetry_api/src/api/metrics/counter.dart';
 import 'package:opentelemetry_api/src/api/metrics/gauge.dart';
@@ -32,6 +33,14 @@ import '../id/id_generator.dart';
 import '../metrics/meter.dart';
 import '../metrics/observable_callback.dart';
 
+/// Factory function that creates an instance of OTelAPIFactory.
+///
+/// This function is used as the default factory function for creating OTelAPIFactory
+/// instances when no SDK is installed.
+///
+/// [apiEndpoint] The endpoint URL for the OpenTelemetry backend
+/// [apiServiceName] The name of the service being instrumented
+/// [apiServiceVersion] The version of the service being instrumented
 OTelFactory otelApiFactoryFactoryFunction({
   required String apiEndpoint,
   required String apiServiceName,
@@ -48,7 +57,12 @@ OTelFactory otelApiFactoryFactoryFunction({
 /// requires the API to work without an SDK installed
 /// All construction APIs use the factory, such as builders or 'from' helpers.
 class OTelAPIFactory extends OTelFactory {
-
+  /// Creates a new instance of OTelAPIFactory with the specified parameters.
+  ///
+  /// [apiEndpoint] The endpoint URL for the OpenTelemetry backend
+  /// [apiServiceName] The name of the service being instrumented
+  /// [apiServiceVersion] The version of the service being instrumented
+  /// [factoryFactory] Optional factory function for creating OTelFactory instances
   OTelAPIFactory(
       {required super.apiEndpoint,
       required super.apiServiceName,
@@ -114,6 +128,15 @@ class OTelAPIFactory extends OTelFactory {
     return attrsFromMap(namedMap);
   }
 
+  /// Creates Attributes from a map of string keys to arbitrary values.
+  ///
+  /// This method handles converting various value types to appropriate attribute values:
+  /// - String values become string attributes (empty strings are ignored)
+  /// - int, double, and bool values become their respective attribute types
+  /// - DateTime values are converted to ISO8601 string attributes
+  /// - Attribute values are passed through directly
+  /// - Lists of strings, booleans, integers, or doubles become list attributes
+  /// - Other values are converted to strings using toString()
   static Attributes attrsFromMap(Map<String, Object> namedMap) {
     final attributes = <Attribute>[];
     namedMap.forEach((key, value) {
@@ -129,25 +152,27 @@ class OTelAPIFactory extends OTelFactory {
         attributes.add(AttributeCreate.create<bool>(key, value));
       } else if (value is DateTime) {
         final String isoTimestamp = Timestamp.dateTimeToString(value);
-        attributes
-            .add(AttributeCreate.create<String>(key, isoTimestamp));
+        attributes.add(AttributeCreate.create<String>(key, isoTimestamp));
       } else if (value is Attribute) {
         attributes.add(value);
       } else if (value is List) {
         if (value.isNotEmpty) {
           if (value.first is String) {
-            attributes.add(AttributeCreate.create<List<String>>(key, value as List<String>));
+            attributes.add(AttributeCreate.create<List<String>>(
+                key, value as List<String>));
           } else if (value.first is bool) {
-            attributes.add(AttributeCreate.create<List<bool>>(key, value as List<bool>));
+            attributes.add(
+                AttributeCreate.create<List<bool>>(key, value as List<bool>));
           } else if (value.first is int) {
-            attributes.add(AttributeCreate.create<List<int>>(key, value as List<int>));
+            attributes.add(
+                AttributeCreate.create<List<int>>(key, value as List<int>));
           } else if (value.first is double) {
-            attributes.add(AttributeCreate.create<List<double>>(key, value as List<double>));
+            attributes.add(AttributeCreate.create<List<double>>(
+                key, value as List<double>));
           }
         }
       } else {
-        attributes
-            .add(AttributeCreate.create<String>(key, '$value'));
+        attributes.add(AttributeCreate.create<String>(key, '$value'));
       }
     });
     return AttributesCreate.create(attributes);
@@ -309,7 +334,8 @@ class OTelAPIFactory extends OTelFactory {
   }
 
   @override
-  APIUpDownCounter createUpDownCounter(String name, {String? description, String? unit}) {
+  APIUpDownCounter createUpDownCounter(String name,
+      {String? description, String? unit}) {
     return UpDownCounterCreate.create(
       name: name,
       description: description,
@@ -331,7 +357,8 @@ class OTelAPIFactory extends OTelFactory {
   }
 
   @override
-  APIHistogram createHistogram(String name, {String? description, String? unit, List<double>? boundaries}) {
+  APIHistogram createHistogram(String name,
+      {String? description, String? unit, List<double>? boundaries}) {
     return HistogramCreate.create(
       name: name,
       description: description,
@@ -343,7 +370,8 @@ class OTelAPIFactory extends OTelFactory {
   }
 
   @override
-  APIObservableCounter createObservableCounter(String name, {String? description, String? unit, ObservableCallback? callback}) {
+  APIObservableCounter createObservableCounter(String name,
+      {String? description, String? unit, ObservableCallback? callback}) {
     return ObservableCounterCreate.create(
       name: name,
       description: description,
@@ -355,7 +383,8 @@ class OTelAPIFactory extends OTelFactory {
   }
 
   @override
-  APIObservableGauge createObservableGauge(String name, {String? description, String? unit, ObservableCallback? callback}) {
+  APIObservableGauge createObservableGauge(String name,
+      {String? description, String? unit, ObservableCallback? callback}) {
     return ObservableGaugeCreate.create(
       name: name,
       description: description,
@@ -367,7 +396,8 @@ class OTelAPIFactory extends OTelFactory {
   }
 
   @override
-  APIObservableUpDownCounter createObservableUpDownCounter(String name, {String? description, String? unit, ObservableCallback? callback}) {
+  APIObservableUpDownCounter createObservableUpDownCounter(String name,
+      {String? description, String? unit, ObservableCallback? callback}) {
     return ObservableUpDownCounterCreate.create(
       name: name,
       description: description,

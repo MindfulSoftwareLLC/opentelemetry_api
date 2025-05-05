@@ -1,12 +1,21 @@
 // Licensed under the Apache License, Version 2.0
 // Copyright 2025, Michael Bushe, All rights reserved.
 
+// ignore_for_file: public_member_api_docs
+
 /// OpenTelemetry Semantic Conventions - Dart Enums
 library;
 
 import 'package:opentelemetry_api/src/api/semantics/semantics.dart';
 
+/// Extension on OTelSemantic to provide utility methods.
 extension OTelSemanticExtension on OTelSemantic {
+  /// Converts this semantic attribute and its value to a MapEntry.
+  ///
+  /// This allows semantic attributes to be easily used with Dart's Map API.
+  ///
+  /// [value] The value to associate with this semantic attribute's key.
+  /// Returns a MapEntry with this semantic's key and the provided value.
   MapEntry<String, Object> toMapEntry(Object value) => MapEntry(key, value);
 }
 
@@ -60,7 +69,6 @@ enum ComputeUnitResource implements OTelSemantic {
 
   const ComputeUnitResource(this.key);
 }
-
 
 // Compute Instance Semantic Resource
 /// [Specification](https://opentelemetry.io/docs/specs/semconv/resource/#compute-instance)
@@ -340,7 +348,12 @@ enum HttpResource implements OTelSemantic {
 /// String methodKey = HttpAttributes.requestMethod.key;
 // ```
 // methodKey will be 'http.request.method'
+/// Utility class for creating OpenTelemetry HTTP header attribute keys.
+///
+/// This class provides a way to generate properly formatted HTTP header attribute keys
+/// following the OpenTelemetry specification for HTTP headers.
 class HttpHeaderAttribute {
+  /// The OpenTelemetry attribute key for the HTTP header.
   final String key;
 
   /// Constructor for HTTP request headers

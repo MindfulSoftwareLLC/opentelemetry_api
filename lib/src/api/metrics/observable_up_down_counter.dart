@@ -21,7 +21,9 @@ class APIObservableUpDownCounter<T extends num> {
   final List<ObservableCallback<T>> _callbacks = [];
 
   /// Creates a new observable up-down counter instrument
-  APIObservableUpDownCounter(this._name, this._description, this._unit, this._enabled, this._meter, [ObservableCallback<T>? callback]) {
+  APIObservableUpDownCounter(
+      this._name, this._description, this._unit, this._enabled, this._meter,
+      [ObservableCallback<T>? callback]) {
     if (callback != null) {
       addCallback(callback);
     }
@@ -65,7 +67,8 @@ class APIObservableUpDownCounter<T extends num> {
 }
 
 /// Default implementation of [APICallbackRegistration].
-class _CallbackRegistration<T extends num> implements APICallbackRegistration<T> {
+class _CallbackRegistration<T extends num>
+    implements APICallbackRegistration<T> {
   final APIObservableUpDownCounter<T> _instrument;
   final ObservableCallback<T> _callback;
 

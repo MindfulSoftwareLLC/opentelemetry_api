@@ -17,14 +17,15 @@ class Attributes {
 
   /// Creates an Attributes instance from a map of key-value pairs.
   /// Uses the appropriate factory method (OTelFactory or OTelAPIFactory) based on initialization state.
-  /// 
+  ///
   /// @param map The map of key-value pairs to convert to attributes
   /// @return A new Attributes instance containing the converted attributes
   static Attributes of(Map<String, Object> map) {
     // Directly use the API factory's attrsFromMap if not initialized
     // This is to allow the creation of attributes for initialization and is
     // Overrides would take effect after initialization.
-    return OTelFactory.otelFactory != null ? OTelFactory.otelFactory!.attributesFromMap(map)
+    return OTelFactory.otelFactory != null
+        ? OTelFactory.otelFactory!.attributesFromMap(map)
         : OTelAPIFactory.attrsFromMap(map);
   }
 
@@ -57,22 +58,32 @@ class Attributes {
         // Try to convert the list to a supported type
         if (value.isNotEmpty) {
           if (value.every((e) => e is String)) {
-            attributes.add(AttributeCreate.create<List<String>>(key, value.cast<String>()));
+            attributes.add(AttributeCreate.create<List<String>>(
+                key, value.cast<String>()));
           } else if (value.every((e) => e is bool)) {
-            attributes.add(AttributeCreate.create<List<bool>>(key, value.cast<bool>()));
+            attributes.add(
+                AttributeCreate.create<List<bool>>(key, value.cast<bool>()));
           } else if (value.every((e) => e is int)) {
-            attributes.add(AttributeCreate.create<List<int>>(key, value.cast<int>()));
+            attributes
+                .add(AttributeCreate.create<List<int>>(key, value.cast<int>()));
           } else if (value.every((e) => e is double || e is int)) {
             // Convert all to double
-            attributes.add(AttributeCreate.create<List<double>>(key, value.map((e) => e is int ? e.toDouble() : e as double).toList()));
+            attributes.add(AttributeCreate.create<List<double>>(
+                key,
+                value
+                    .map((e) => e is int ? e.toDouble() : e as double)
+                    .toList()));
           } else {
-            OTelLog.warn('Ignoring attribute $key because the list contains unsupported types. Only String, bool, int, double lists are allowed by the OTel specification.');
+            OTelLog.warn(
+                'Ignoring attribute $key because the list contains unsupported types. Only String, bool, int, double lists are allowed by the OTel specification.');
           }
         } else {
-          OTelLog.warn('Ignoring attribute $key because empty lists are not allowed by the OTel specification.');
+          OTelLog.warn(
+              'Ignoring attribute $key because empty lists are not allowed by the OTel specification.');
         }
       } else {
-        OTelLog.warn('Ignoring attribute $key because the value is not a valid attribute type. Only String, bool, int, double and Lists of those types are allowed by the OTel specification.');
+        OTelLog.warn(
+            'Ignoring attribute $key because the value is not a valid attribute type. Only String, bool, int, double and Lists of those types are allowed by the OTel specification.');
       }
     }
 
@@ -148,7 +159,7 @@ class Attributes {
   }
 
   /// Creates a new Attributes instance with a String attribute added or updated.
-  /// 
+  ///
   /// @param name The attribute key
   /// @param value The String value
   /// @return A new Attributes instance with the added/updated attribute
@@ -160,7 +171,7 @@ class Attributes {
   }
 
   /// Creates a new Attributes instance with a Boolean attribute added or updated.
-  /// 
+  ///
   /// @param name The attribute key
   /// @param value The Boolean value
   /// @return A new Attributes instance with the added/updated attribute
@@ -172,7 +183,7 @@ class Attributes {
   }
 
   /// Creates a new Attributes instance with an Integer attribute added or updated.
-  /// 
+  ///
   /// @param name The attribute key
   /// @param value The Integer value
   /// @return A new Attributes instance with the added/updated attribute
@@ -184,7 +195,7 @@ class Attributes {
   }
 
   /// Creates a new Attributes instance with a Double attribute added or updated.
-  /// 
+  ///
   /// @param name The attribute key
   /// @param value The Double value
   /// @return A new Attributes instance with the added/updated attribute
@@ -196,7 +207,7 @@ class Attributes {
   }
 
   /// Creates a new Attributes instance with a String List attribute added or updated.
-  /// 
+  ///
   /// @param name The attribute key
   /// @param value The String List value
   /// @return A new Attributes instance with the added/updated attribute
@@ -208,7 +219,7 @@ class Attributes {
   }
 
   /// Creates a new Attributes instance with a Boolean List attribute added or updated.
-  /// 
+  ///
   /// @param name The attribute key
   /// @param value The Boolean List value
   /// @return A new Attributes instance with the added/updated attribute
@@ -220,7 +231,7 @@ class Attributes {
   }
 
   /// Creates a new Attributes instance with an Integer List attribute added or updated.
-  /// 
+  ///
   /// @param name The attribute key
   /// @param value The Integer List value
   /// @return A new Attributes instance with the added/updated attribute
@@ -232,7 +243,7 @@ class Attributes {
   }
 
   /// Creates a new Attributes instance with a Double List attribute added or updated.
-  /// 
+  ///
   /// @param name The attribute key
   /// @param value The Double List value
   /// @return A new Attributes instance with the added/updated attribute
@@ -244,7 +255,7 @@ class Attributes {
   }
 
   /// Creates a new Attributes instance by adding or updating multiple attributes.
-  /// 
+  ///
   /// @param other A list of attributes to add or update
   /// @return A new Attributes instance with the added/updated attributes
   /// If the input list is empty, returns this instance unchanged.
@@ -263,7 +274,7 @@ class Attributes {
 
   /// Creates a new Attributes instance by combining with another Attributes instance.
   /// Attributes from the other instance will overwrite attributes with the same keys in this instance.
-  /// 
+  ///
   /// @param other The Attributes instance to combine with
   /// @return A new Attributes instance with the combined attributes
   Attributes copyWithAttributes(Attributes other) {
@@ -272,7 +283,7 @@ class Attributes {
 
   /// Creates a new Attributes instance with the specified attribute removed.
   /// If the key doesn't exist, returns this instance unchanged.
-  /// 
+  ///
   /// @param key The key of the attribute to remove
   /// @return A new Attributes instance with the attribute removed
   Attributes copyWithout(String key) {
@@ -314,7 +325,6 @@ extension AttributesExtension on Map<String, Object> {
   /// Convert this map to Attributes
   /// Empty string are not allowed and are skipped
   Attributes toAttributes() {
-
     if (OTelFactory.otelFactory == null) {
       // Cheating here since Attributes is unlikely to be overriden in a
       // factory and is often called before initialize

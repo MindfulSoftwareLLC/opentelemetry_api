@@ -12,14 +12,14 @@ class IdGenerator {
   /// Returns bytes which can be formatted as a 32-char hex string.
   static Uint8List generateTraceId() {
     final Uint8List bytes = Uint8List(16);
-    
+
     // Generate random bytes until we get a non-zero ID
     do {
       for (int i = 0; i < bytes.length; i++) {
         bytes[i] = _random.nextInt(256);
       }
     } while (_isZero(bytes));
-    
+
     return bytes;
   }
 
@@ -27,14 +27,14 @@ class IdGenerator {
   /// Returns bytes which can be formatted as a 16-char hex string.
   static Uint8List generateSpanId() {
     final bytes = Uint8List(8);
-    
+
     // Generate random bytes until we get a non-zero ID
     do {
       for (int i = 0; i < bytes.length; i++) {
         bytes[i] = _random.nextInt(256);
       }
     } while (_isZero(bytes));
-    
+
     return bytes;
   }
 
@@ -54,16 +54,16 @@ class IdGenerator {
   /// Parse hex string to bytes.
   static Uint8List? hexToBytes(String hex) {
     if (hex.length % 2 != 0) return null;
-    
+
     final bytes = Uint8List(hex.length ~/ 2);
-    
+
     for (var i = 0; i < bytes.length; i++) {
       final hexByte = hex.substring(i * 2, (i * 2) + 2);
       final byte = int.tryParse(hexByte, radix: 16);
       if (byte == null) return null;
       bytes[i] = byte;
     }
-    
+
     return bytes;
   }
 }

@@ -22,7 +22,9 @@ class APIObservableGauge<T extends num> {
   final List<ObservableCallback<T>> _callbacks = [];
 
   /// Creates a new observable gauge instrument
-  APIObservableGauge(this._name, this._description, this._unit, this._enabled, this._meter, [ObservableCallback<T>? callback]) {
+  APIObservableGauge(
+      this._name, this._description, this._unit, this._enabled, this._meter,
+      [ObservableCallback<T>? callback]) {
     if (callback != null) {
       addCallback(callback);
     }
@@ -66,7 +68,8 @@ class APIObservableGauge<T extends num> {
 }
 
 /// Default implementation of [APICallbackRegistration].
-class _CallbackRegistration<T extends num> implements APICallbackRegistration<T> {
+class _CallbackRegistration<T extends num>
+    implements APICallbackRegistration<T> {
   final APIObservableGauge<T> _instrument;
   final ObservableCallback<T> _callback;
 

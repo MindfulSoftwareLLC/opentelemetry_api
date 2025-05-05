@@ -1,7 +1,16 @@
 // Licensed under the Apache License, Version 2.0
 // Copyright 2025, Michael Bushe, All rights reserved.
 
-library;
+/// OpenTelemetry API for Dart
+///
+/// This library provides the OpenTelemetry API implementation for Dart,
+/// following the OpenTelemetry specification. It includes support for
+/// tracing, metrics, baggage, and context propagation.
+///
+/// For more information, see the OpenTelemetry specification at
+/// https://opentelemetry.io/docs/specs/otel/
+library opentelemetry_api;
+
 // Baggage
 export 'src/api/baggage/baggage.dart';
 export 'src/api/baggage/baggage_entry.dart';

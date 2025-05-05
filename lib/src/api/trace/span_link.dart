@@ -19,7 +19,7 @@ class SpanLink {
   final Attributes attributes;
 
   /// Creates a new [SpanLink].
-   SpanLink._({
+  SpanLink._({
     required this.spanContext,
     required this.attributes,
   });

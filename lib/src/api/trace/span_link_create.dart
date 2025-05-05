@@ -10,7 +10,9 @@ class SpanLinkCreate {
     required SpanContext spanContext,
     Attributes? attributes,
   }) {
-    if (OTelFactory.otelFactory == null) throw StateError('Call initialize() first.');
+    if (OTelFactory.otelFactory == null) {
+      throw StateError('Call initialize() first.');
+    }
     return SpanLink._(
       spanContext: spanContext,
       attributes: attributes ?? OTelFactory.otelFactory!.attributes([]),

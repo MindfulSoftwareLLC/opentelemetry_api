@@ -1,7 +1,6 @@
 // Licensed under the Apache License, Version 2.0
 // Copyright 2025, Michael Bushe, All rights reserved.
 
-
 // ignore_for_file: unnecessary_getters_setters
 
 import '../../../opentelemetry_api.dart' show OTelAPI, OTelLog;
@@ -46,9 +45,14 @@ class APITracerProvider {
         _enabled = enabled,
         _isShutdown = isShutdown;
 
-
+  /// Gets the endpoint URL used by this tracer provider.
+  ///
+  /// This is the URL where telemetry data will be sent.
   String get endpoint => _endpoint;
 
+  /// Sets the endpoint URL used by this tracer provider.
+  ///
+  /// This is the URL where telemetry data will be sent.
   set endpoint(String value) {
     _endpoint = value;
   }
@@ -68,7 +72,8 @@ class APITracerProvider {
     // Validate the tracer name; if invalid (empty), log a warning and use empty string.
     final validatedName = name.isEmpty ? '' : name;
     if (validatedName.isEmpty) {
-      OTelLog.warn('Invalid tracer name provided; using empty string as fallback.');
+      OTelLog.warn(
+          'Invalid tracer name provided; using empty string as fallback.');
     }
 
     // Apply default values if none are provided
@@ -82,7 +87,8 @@ class APITracerProvider {
     }
 
     // Create a cache key based on the provided parameters.
-    final key = _TracerKey(validatedName, effectiveVersion, effectiveSchemaUrl, attributes);
+    final key = _TracerKey(
+        validatedName, effectiveVersion, effectiveSchemaUrl, attributes);
 
     if (_tracerCache.containsKey(key)) {
       return _tracerCache[key]!;
@@ -98,26 +104,50 @@ class APITracerProvider {
     }
   }
 
+  /// Gets the service name used by this tracer provider.
+  ///
+  /// The service name is a required resource attribute that uniquely identifies the service.
   String get serviceName => _serviceName;
 
+  /// Sets the service name used by this tracer provider.
+  ///
+  /// The service name is a required resource attribute that uniquely identifies the service.
   set serviceName(String value) {
     _serviceName = value;
   }
 
+  /// Gets the service version used by this tracer provider.
+  ///
+  /// The service version is an optional resource attribute that specifies the version of the service.
   String? get serviceVersion => _serviceVersion;
 
+  /// Sets the service version used by this tracer provider.
+  ///
+  /// The service version is an optional resource attribute that specifies the version of the service.
   set serviceVersion(String? value) {
     _serviceVersion = value;
   }
 
+  /// Returns whether this tracer provider is enabled.
+  ///
+  /// When disabled, tracers will not create spans or send telemetry data.
   bool get enabled => _enabled;
 
+  /// Sets whether this tracer provider is enabled.
+  ///
+  /// When disabled, tracers will not create spans or send telemetry data.
   set enabled(bool value) {
     _enabled = value;
   }
 
+  /// Returns whether this tracer provider has been shut down.
+  ///
+  /// A shut down provider will not create new tracers or spans.
   bool get isShutdown => _isShutdown;
 
+  /// Sets whether this tracer provider has been shut down.
+  ///
+  /// This should only be set internally during the shutdown process.
   set isShutdown(bool value) {
     _isShutdown = value;
   }
@@ -130,7 +160,7 @@ class APITracerProvider {
   /// Returns true if shutdown was successful.
   Future<bool> shutdown() async {
     if (_isShutdown) {
-      return true;  // Already shut down
+      return true; // Already shut down
     }
 
     try {
