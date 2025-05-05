@@ -172,7 +172,7 @@ void main() {
         expect(Context.current.span, equals(span)); // Should be active inside the callback
 
         // Make sure it stays active during an await
-        await Future.delayed(const Duration(milliseconds: 10));
+        await Future<void>.delayed(const Duration(milliseconds: 10));
         expect(Context.current.span, equals(span)); // Should still be active
       });
 
@@ -263,7 +263,7 @@ void main() {
         expect(Context.current.span, equals(span)); // Should be active inside the callback
 
         // Make sure it stays active during an await
-        await Future.delayed(const Duration(milliseconds: 10));
+        await Future<void>.delayed(const Duration(milliseconds: 10));
         expect(Context.current.span, equals(span)); // Should still be active
 
         return 'test-result';
@@ -297,7 +297,7 @@ void main() {
         name: 'test-span',
         fn: () async {
           executed = true;
-          await Future.delayed(const Duration(milliseconds: 10));
+          await Future<void>.delayed(const Duration(milliseconds: 10));
           return 'test-result';
         },
       );

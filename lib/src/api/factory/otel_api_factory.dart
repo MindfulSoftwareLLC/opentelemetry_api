@@ -59,12 +59,12 @@ class OTelAPIFactory extends OTelFactory {
 
   @override
   BaggageEntry baggageEntry(String value, [String? metadata]) {
-    return BaggageEntryFactory.create(value, metadata);
+    return BaggageEntryFactory.create<String>(value, metadata);
   }
 
   @override
   Baggage baggage([Map<String, BaggageEntry>? entries]) {
-    return BaggageCreate.create(entries);
+    return BaggageCreate.create<Map<String, BaggageEntry>>(entries);
   }
 
   @override
@@ -119,35 +119,35 @@ class OTelAPIFactory extends OTelFactory {
     namedMap.forEach((key, value) {
       if (value is String) {
         if (value.isNotEmpty) {
-          attributes.add(AttributeCreate.create(key, value));
+          attributes.add(AttributeCreate.create<String>(key, value));
         }
       } else if (value is int) {
-        attributes.add(AttributeCreate.create(key, value));
+        attributes.add(AttributeCreate.create<int>(key, value));
       } else if (value is double) {
-        attributes.add(AttributeCreate.create(key, value));
+        attributes.add(AttributeCreate.create<double>(key, value));
       } else if (value is bool) {
-        attributes.add(AttributeCreate.create(key, value));
+        attributes.add(AttributeCreate.create<bool>(key, value));
       } else if (value is DateTime) {
         final String isoTimestamp = Timestamp.dateTimeToString(value);
         attributes
-            .add(AttributeCreate.create(key, isoTimestamp));
+            .add(AttributeCreate.create<String>(key, isoTimestamp));
       } else if (value is Attribute) {
         attributes.add(value);
       } else if (value is List) {
         if (value.isNotEmpty) {
           if (value.first is String) {
-            attributes.add(AttributeCreate.create(key, value as List<String>));
+            attributes.add(AttributeCreate.create<List<String>>(key, value as List<String>));
           } else if (value.first is bool) {
-            attributes.add(AttributeCreate.create(key, value as List<bool>));
+            attributes.add(AttributeCreate.create<List<bool>>(key, value as List<bool>));
           } else if (value.first is int) {
-            attributes.add(AttributeCreate.create(key, value as List<int>));
+            attributes.add(AttributeCreate.create<List<int>>(key, value as List<int>));
           } else if (value.first is double) {
-            attributes.add(AttributeCreate.create(key, value as List<double>));
+            attributes.add(AttributeCreate.create<List<double>>(key, value as List<double>));
           }
         }
       } else {
         attributes
-            .add(AttributeCreate.create(key, '$value'));
+            .add(AttributeCreate.create<String>(key, '$value'));
       }
     });
     return AttributesCreate.create(attributes);

@@ -225,7 +225,7 @@ class OTelAPI {
   }
 
   /// Creates a baggage instance from a JSON representation.
-  static baggageFromJson(Map<String, dynamic> json) {
+  static Baggage baggageFromJson(Map<String, dynamic> json) {
     _getAndCacheOtelFactory();
     final entries = <String, BaggageEntry>{};
     for (final entry in json.entries) {

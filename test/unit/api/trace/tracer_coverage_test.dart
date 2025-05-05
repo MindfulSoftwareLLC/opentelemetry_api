@@ -49,7 +49,7 @@ void main() {
         await tracer.recordSpanAsync(
           name: 'error-span',
           fn: () async {
-            await Future.delayed(const Duration(milliseconds: 10));
+            await Future<void>.delayed(const Duration(milliseconds: 10));
             throw Exception('Test error');
           },
         );

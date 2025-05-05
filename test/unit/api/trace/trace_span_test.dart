@@ -65,12 +65,12 @@ void main() {
     final span = tracer.startSpan('test-span');
 
     // Add attributes
-    span.setStringAttribute('string-key', 'string-value');
+    span.setStringAttribute<String>('string-key', 'string-value');
     span.setBoolAttribute('bool-key', true);
     span.setIntAttribute('int-key', 123);
     span.setDoubleAttribute('double-key', 123.456);
 
-    span.setStringAttribute('string-key-2', 'string-value-2');
+    span.setStringAttribute<String>('string-key-2', 'string-value-2');
     span.setBoolAttribute('bool-key-2', false);
     span.setIntAttribute('int-key-2', 456);
     span.setDoubleAttribute('double-key-2', 789.1011);

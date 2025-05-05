@@ -65,7 +65,7 @@ void main() {
       for (var i = 0; i < 3; i++) {
         futures.add(
           context.run(() async {
-            await Future.delayed(const Duration(milliseconds: 10));
+            await Future<void>.delayed(const Duration(milliseconds: 10));
             throw Exception('Error $i');
           }),
         );
@@ -73,7 +73,7 @@ void main() {
 
       var caughtCount = 0;
       await Future.wait(
-        futures.map((f) => f.catchError((e) {
+        futures.map((f) => f.catchError((Object e) {
               expect(e, isA<Exception>());
               expect(e.toString(), matches(r'Error \d'));
               caughtCount++;
@@ -111,7 +111,7 @@ void main() {
 
       try {
         await Context.current.run(() async {
-          await Future.delayed(const Duration(milliseconds: 100));
+          await Future<void>.delayed(const Duration(milliseconds: 100));
           return null;
         }).timeout(const Duration(milliseconds: 50));
         fail('Expected timeout exception');

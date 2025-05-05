@@ -86,13 +86,13 @@ void main() {
       final span = tracer.startSpan('test-span');
 
       // Test individual attribute setters
-      span.setStringAttribute('string.key', 'string-value');
+      span.setStringAttribute<String>('string.key', 'string-value');
       span.setBoolAttribute('bool.key', true);
       span.setIntAttribute('int.key', 42);
       span.setDoubleAttribute('double.key', 3.14);
 
       // Set list attributes
-      span.setStringListAttribute('string.list', ['a', 'b', 'c']);
+      span.setStringListAttribute<List<String>>('string.list', ['a', 'b', 'c']);
       span.setBoolListAttribute('bool.list', [true, false, true]);
       span.setIntListAttribute('int.list', [1, 2, 3]);
       span.setDoubleListAttribute('double.list', [1.1, 2.2, 3.3]);
@@ -170,7 +170,7 @@ void main() {
       span.end();
 
       // These should all be ignored
-      span.setStringAttribute('key', 'value');
+      span.setStringAttribute<String>('key', 'value');
       span.setStatus(SpanStatusCode.Error, 'Error');
       span.updateName('new-name');
 
