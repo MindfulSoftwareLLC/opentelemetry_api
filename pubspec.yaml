@@ -3,8 +3,6 @@ description: Dartastic.io's OpenTelemetry API for Dart following the OpenTelemet
 version: 0.8.0
 repository: https://github.com/MindfulSoftwareLLC/opentelemetry_api.git
 homepage: https://dartastic.io
-#publish_to: https://dartastic-pubserver-6djqlrsgkq-uc.a.run.app
-# TODO fix gateway publish_to: https://pub.dartastic.io
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
