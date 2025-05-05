@@ -30,7 +30,7 @@ void main() {
     test('should store and retrieve bool attributes', () {
       var value = true;
       var name = 'test.bool.key';
-      attributes = attributes.withBoolAttribute(name, value);
+      attributes = attributes.copyWithBoolAttribute(name, value);
 
       expect(attributes.getBool(name), equals(value));
       expect(attributes.toMap()[name]!.value, equals(value));

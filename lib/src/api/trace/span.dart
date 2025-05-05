@@ -181,7 +181,7 @@ class APISpan {
   /// Ignored if isEnded
   void setBoolAttribute(String name, bool value) {
     if (!isEnded) {
-      _attributes = _attributes.withBoolAttribute(name, value);
+      _attributes = _attributes.copyWithBoolAttribute(name, value);
     }
   }
 
